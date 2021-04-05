@@ -21,3 +21,13 @@ def api_collection_data(collection_id):
         return jsonify((query.to_json_api()))
     except:
         return Json_404()
+
+
+@app.route(API_ROUTE+"/image/<int:image_id>")
+@login_required
+def api_image_data(image_id):
+    try:
+        query = Image.query.get(image_id)
+        return jsonify((query.to_json_api()))
+    except:
+        return Json_404()
