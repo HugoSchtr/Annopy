@@ -201,13 +201,13 @@ class Annotation(db.Model):
             "type": "annotation",
             "attributes": {
                 "id": self.annotation_id,
+                "json": self.annotation_json,
                 "relationships": {
                     "editions": [
                         author.author_anno_to_json()
                         for author in self.annotation_authorship
                     ]
-                },
-                "json": self.annotation_json,
+                }
             }
         }
 
