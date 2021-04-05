@@ -25,7 +25,7 @@ from .routes import generic, collections, errors, api
 def config_app(config_name="test"):
     """ Création de l'application """
     app.config.from_object(CONFIG[config_name])
-
+    app.config['JSON_SORT_KEYS'] = False
     # Set up extensions
     db.init_app(app)
     # assets_env = Environment(app)
