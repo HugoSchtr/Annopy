@@ -24,7 +24,10 @@
     {% if current_user.is_authenticated %}
     <dt>Images</dt>
     {% for img in imgs %}
-    <dd>Image {{loop.index}} : <a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">{{img.image.image_url}}</a>
+    <dd>        <ol><li>Image {{loop.index}} :
+        <a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">Pour annoter cette image, cliquez-ici.</a>
+        </br>
+            <p>Pour accéder aux données de cette image : <a href="{{url_for('api_image_data', image_id=img.image.image_id)}}">API</a></li></p>
         {% set annotations = img.image.annotation %}
         {% if annotations %}
         {% for annotation in annotations %}
@@ -36,6 +39,7 @@
         {% endfor %}
         {% endfor %}
         {%endif%}
+    </ol>
     </dd>
     {% endfor %}
     {% else %}
