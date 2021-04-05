@@ -49,19 +49,31 @@ class Collection(db.Model):
         return self.collection_id
 
     def to_json_api(self):
-        is_finished = ""
-        if self.is_finished == 1:
-            is_finished = "Complete"
-        else:
-            is_finished = "Not complete yet"
         return {
             "type": "collection",
+            "id": self.collection_id,
             "attributes": {
                 "name": self.collection_name,
+                "Category": [
+                    category.category_to_json()
+                    for category in self.has_categories
+                ],
                 "description": self.collection_description,
-                "date": self.collection_date,
-                "is_finished": is_finished
-            }
+            },
+            "relationships": {
+                "editions": [
+                    author.author_to_json()
+                    for author in self.collection_authorship
+                ]
+            },
+            "images": [
+                image.image_to_json()
+                for image in self.has_images
+            ],
+            "links": {
+                "self": url_for("collection", collection_id=self.collection_id, _external=True),
+                "json": url_for("api_collection_data", collection_id=self.collection_id, _external=True)
+            },
         }
 
 
@@ -103,6 +115,18 @@ class Category(db.Model):
         except Exception as erreur:
             return False, [str(erreur)]
 
+    def to_json_api(self):
+        """ It ressembles a little JSON API format but it is not completely compatible
+
+        :return:
+        """
+        return {
+            "type": "category",
+            "attributes": {
+                "category_name": self.name
+            }
+        }
+
 
 class CollectionHasCategories(db.Model):
     __tablename__ = "collection_categories"
@@ -111,6 +135,11 @@ class CollectionHasCategories(db.Model):
     category_id = db.Column(db.Integer(), db.ForeignKey('categories.id'))
     collection = db.relationship("Collection", back_populates="has_categories")
     category = db.relationship("Category", back_populates="has_collection")
+
+    def category_to_json(self):
+        return {
+            "category": self.category.to_json_api(),
+        }
 
 
 class Image(db.Model):
@@ -144,12 +173,17 @@ class Image(db.Model):
     def get_id(self):
         return self.image_id
 
-    def to_json_api_dict(self):
+    def to_json_api(self):
         return {
             "type": "image",
             "attributes": {
+                "id": self.image_id,
                 "url": self.image_url,
-                "name": self.image_name,
+                "annotations":
+                [
+                    annotation.to_json_api()
+                    for annotation in self.annotation
+                ]
             }
         }
 
@@ -162,6 +196,21 @@ class Annotation(db.Model):
     image = db.relationship("Image", back_populates="annotation")
     annotation_authorship = db.relationship("AuthorshipAnnotation", back_populates="annotation", cascade="all, delete")
 
+    def to_json_api(self):
+        return {
+            "type": "annotation",
+            "attributes": {
+                "id": self.annotation_id,
+                "relationships": {
+                    "editions": [
+                        author.author_anno_to_json()
+                        for author in self.annotation_authorship
+                    ]
+                },
+                "json": self.annotation_json,
+            }
+        }
+
 
 class AuthorshipCollection(db.Model):
     authorship_collection_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
@@ -171,10 +220,10 @@ class AuthorshipCollection(db.Model):
     user = db.relationship("User", back_populates="authorship_collection")
     collection = db.relationship("Collection", back_populates="collection_authorship")
 
-    def authorship_collection_to_json(self):
+    def author_to_json(self):
         return {
             "author": self.user.to_json_api(),
-            "on": self.authorshipCollection_date
+            "on": self.authorship_collection_date
         }
 
 
@@ -186,6 +235,12 @@ class AuthorshipAnnotation(db.Model):
     user = db.relationship("User", back_populates="authorship_annotation")
     annotation = db.relationship("Annotation", back_populates="annotation_authorship", cascade="all, delete")
 
+    def author_anno_to_json(self):
+        return {
+            "author": self.user.to_json_api(),
+            "on": self.authorship_annotation_date
+        }
+
 
 class CollectionHasImages(db.Model):
     collection_has_images_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
@@ -193,3 +248,8 @@ class CollectionHasImages(db.Model):
     collection_has_images_image_id = db.Column(db.Integer, db.ForeignKey('image.image_id'))
     collection = db.relationship("Collection", back_populates="has_images")
     image = db.relationship("Image", back_populates="has_collection", cascade="all, delete")
+
+    def image_to_json(self):
+        return {
+            "image": self.image.to_json_api()
+        }

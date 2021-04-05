@@ -124,7 +124,7 @@ class User(UserMixin, db.Model):
         """
         return self.user_id
 
-    def to_jsonapi_dict(self):
+    def to_json_api(self):
         """ It ressembles a little JSON API format but it is not completely compatible
 
         :return:
@@ -132,7 +132,7 @@ class User(UserMixin, db.Model):
         return {
             "type": "people",
             "attributes": {
-                "name": self.user_nom
+                "login": self.user_login
             }
         }
 
