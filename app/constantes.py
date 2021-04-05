@@ -12,7 +12,7 @@ if SECRET_KEY == "JE SUIS UN SECRET !":
 class _TEST:
     SECRET_KEY = SECRET_KEY
     # On configure la base de données
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///db_test.sqlite'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
