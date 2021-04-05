@@ -13,13 +13,14 @@
 </div>
 
 {% if collections %}
-<p style="text-align: center; padding-top: 20px">Plusieurs projets sont en cours :</p>
+<p style="text-align: center; padding-top: 20px">Dernières collections créées :</p>
 <ul>
 {% for collection in collections %}
     {% set categories = collection.has_categories %}
-    <li><b>{{collection.collection_name}}</b> - {{collection.collection_description}}. <u>Catégorie</u> : {% for category in categories %}
+    <li><b>{{collection.collection_name}}</b> </br> <u>Description</u> : {{collection.collection_description}} </br> <u>Catégorie</u> : {% for category in categories %}
     {{category.category.name}}
     {% endfor %}</li>
+    </br>
 {% endfor %}
 </ul>
 {% else %}
