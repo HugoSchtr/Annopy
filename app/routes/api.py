@@ -1,5 +1,6 @@
 from flask import render_template, request, url_for, jsonify
 from urllib.parse import urlencode
+from flask_login import login_required
 
 from ..app import app
 from ..constantes import API_ROUTE
@@ -13,6 +14,7 @@ def Json_404():
 
 
 @app.route(API_ROUTE+"/collection/<int:collection_id>")
+@login_required
 def api_collection_data(collection_id):
     try:
         query = Collection.query.get(collection_id)
