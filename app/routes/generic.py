@@ -8,7 +8,7 @@ from ..modeles.users import User
 
 @app.route("/")
 def homepage():
-    collections = Collection.query.all()
+    collections = Collection.query.order_by(Collection.collection_id.desc()).limit(5).all()
     return render_template("pages/index.html", collections=collections)
 
 
