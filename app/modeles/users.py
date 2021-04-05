@@ -132,7 +132,10 @@ class User(UserMixin, db.Model):
         return {
             "type": "people",
             "attributes": {
-                "login": self.user_login
+                "user_id": self.user_id,
+                "login": self.user_login,
+                "user_forename": self.user_forename,
+                "user_surname": self.user_surname
             }
         }
 
