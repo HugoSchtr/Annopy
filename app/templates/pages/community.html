@@ -1,0 +1,18 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+<div>
+    {% if communities %}
+    <p>Nous sommes actuellement {{communities|length}} !</p>
+        <ul>
+            {% for community in communities %}
+                <li>{{community.user_forename}} {{community.user_surname}} ({{community.user_login}})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>La communauté est vide.</p>
+    {% endif %}
+</div>
+{% endblock %}

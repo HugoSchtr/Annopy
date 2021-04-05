@@ -1,0 +1,13 @@
+{% extends "container.html" %}
+{% block afternav %}
+{% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+
+<p>Une collection doit être remplie par des images. Pour upload celles-ci, deux options sont possibles :</p>
+<ol>
+    <li><a href="{{url_for('create_collection_with_flickr')}}">En cliquant ici, vous serez redirigé-e vers la page de création de collection avec ajout des images via l'api IIIF de Flickr</a></li>
+    <li><a href="{{url_for('create_collection_with_iiif')}}">En cliquant ici, vous serez redirigé-e vers la page de création de collection avec ajout des images en utilisant un manifest IIIF</a></li>
+</ol>
+
+{% endblock %}

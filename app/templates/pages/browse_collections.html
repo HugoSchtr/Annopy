@@ -1,0 +1,40 @@
+{% extends "container.html" %}
+{% block afternav %}
+{% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+
+<h1>Projets en cours</h1>
+{% if resultats %}
+<p>Il y a {{resultats.total}} collections actuellement.</p>
+<ul>
+    {% for collection in resultats.items %}
+    <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a></li>
+    {% endfor %}
+</ul>
+<nav aria-label="research-pagination">
+    <ul class="pagination">
+        {% for page in resultats.iter_pages() %}
+        {% if page %}
+        {% if page != resultats.page %}
+        <li class="page-item">
+            <a class="page-link" href="{{url_for('browse_collection', page=page)}}">{{page}}</a>
+        </li>
+        {% else %}
+        <li class="page-item active disabled">
+            <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
+        </li>
+        {% endif %}
+
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link">...</a>
+        </li>
+        {% endif %}
+
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

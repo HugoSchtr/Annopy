@@ -1,0 +1,48 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{%endblock%}
+{% block body %}
+
+
+<h1>Inscription</h1>
+<p>Pour vous inscrire, veuillez remplir le formulaire ci-dessous et cliquez sur "inscription".</p>
+
+<form class="form" method="POST" action="{{url_for('sign_up')}}">
+  <div class="form-group row">
+    <label for="register-forename" class="col-sm-2 col-form-label">Prénom</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="register-forename" name="user_forename" placeholder="Votre prénom">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="register-surname" class="col-sm-2 col-form-label">Nom</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="register-surname"  name="user_surname" placeholder="Votre nom">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="register-login" class="col-sm-2 col-form-label">Login</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="register-login" name="user_login" placeholder="Votre nom d'utilisateur pour vous connecter">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="register-email" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="register-email" name="user_email" placeholder="votre@email.com">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="register-password" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" id="register-password" name="user_password" placeholder="Votre mot de passe (6 caractères minimum)">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary" style="align-self: center">Inscription</button>
+  </div>
+</form>
+
+
+{% endblock %}

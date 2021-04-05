@@ -1,0 +1,59 @@
+{% extends "container.html" %}
+{% block afternav %}
+{% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+
+{% if collection %}
+<h1>{{collection.collection_name}}</h1>
+<dl>
+    <dt>Catégorie</dt>
+    {% for category in categories %}
+    <dd>{{category.category.name}}</dd>
+    {% endfor %}
+    <dt>Description</dt>
+    <dd>{{collection.collection_description}}</dd>
+    <dt>Auteur</dt>
+    {% for authorship in authorships %}
+    <dd>{{authorship.user.user_login}}</dd>
+    {% endfor %}
+    <dt>Date de création</dt>
+    {% for authorship in authorships %}
+    <dd>{{authorship.authorship_collection_date}}</dd>
+    {% endfor %}
+    {% if current_user.is_authenticated %}
+    <dt>Images</dt>
+    {% for img in imgs %}
+    <dd>Image {{loop.index}} : <a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">{{img.image.image_url}}</a>
+        {% set annotations = img.image.annotation %}
+        {% if annotations %}
+        {% for annotation in annotations %}
+            {% set annotation_authorship = Annotation.query.get(annotation.annotation_id).annotation_authorship %}
+            {% for authorship in annotation_authorship %}
+                {% if authorship.user.user_id == current_user.user_id %}
+                    Déjà annotée
+                {% endif %}
+        {% endfor %}
+        {% endfor %}
+        {%endif%}
+
+    </dd>
+    {% endfor %}
+    {% else %}
+    <dt>Images</dt>
+    <dd>Il y a {{imgs|length}} image(s) prêtes à être annotée(s) une fois que vous serez connecté-e !</dd>
+    {% endif %}
+</dl>
+{% if current_user.is_authenticated %}
+<h2>Outils</h2>
+<ul>
+    <li>Pour récupérer les annotations au format JSON, cliquez-ici.</li>
+    <li><a href="{{url_for('delete_collection', collection_id=collection.collection_id)}}">Pour supprimer la collection, cliquez-ici.</a></li>
+</ul>
+{% endif %}
+{% else %}
+<p>Il n'y a pas encore de collection.</p>
+{% endif %}
+<p><a href="{{url_for('homepage')}}">Retour à la page d'accueil</a></p>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{%endblock%}
+{% block body %}
+
+<h1>Vos informations personnelles</h1>
+<p>Login : {{current_user.user_login}}</p>
+<p>Prénom : {{current_user.user_forename}}</p>
+<p>Nom : {{current_user.user_surname}}</p>
+
+<h1>Pour modifier vos informations personnelles, vous pouvez modifier les champs souhaités ci-dessous :</h1>
+<form class="form" method="POST" action="{{url_for('profile')}}">
+  <div class="form-group row">
+    <label for="update-forename" class="col-sm-2 col-form-label">Prénom</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="update-forename" name="forename" placeholder="Prénom à modifier">
+    </div>
+  </div>
+      <div class="form-group row">
+    <label for="update-surname" class="col-sm-2 col-form-label">Nom</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="update-surname" name="surname" placeholder="Nom à modifier">
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Modifier les champs remplis</button>
+  </div>
+</form>
+
+<a href="{{url_for('password_update')}}" class="btn btn-primary" style="margin-top: 10px;">Changer le mot de passe</a>
+
+{% endblock %}

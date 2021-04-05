@@ -1,0 +1,83 @@
+{% extends "container.html" %}
+{% block afternav %}
+{% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+
+<h1>Création d'une nouvelle collection avec IIIF</h1>
+<p>Pour créer une nouvelle collection, remplissez le formulaire et cliquer sur "créer".</p>
+<p>Pour créer une nouvelle collection à l'aide de IIIF, il vous suffit d'indiquer le lien du manifest IIIF JSON que vous
+    souhaitez récupéré, ainsi qu'un intervalle d'images à récupérer. Par exemple, si vous souhaitez récupérer les images
+    3 à 50 du manifest IIIF, indiquez 3 et 50. Nous nous chargerons ensuite de récupérer les URL
+    de chaque image et de les associer à la collection que vous avez créé.</p>
+<p>Exemple de manifest IIIF JSON valides :</p>
+<ul>
+    <li>https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001</li>
+    <li>https://gallica.bnf.fr/iiif/ark:/12148/bpt6k9923506/manifest.json</li>
+</ul>
+
+<form class="form" method="POST" action="{{url_for('create_collection_with_iiif')}}">
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label" for="collection-name">Nom de la collection : </label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="collection-name" name="collection_name"
+                   placeholder="Nom de la nouvelle collection">
+        </div>
+    </div>
+    <div class="form-group row" for="collection-description">
+        <label class="col-sm-2 col-form-label">Description : </label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="collection-description" name="collection_description"
+                   placeholder="Description rapide de la collection">
+        </div>
+    </div>
+    <div class="form-group row" for="manifest-iiif">
+        <label class="col-sm-2 col-form-label">Manifest IIIF</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="manifest-iiif" name="manifest_iiif"
+                   placeholder="Manifest IIIF">
+        </div>
+    </div>
+    </div>
+    <div class="form-group row" for="from-f">
+        <label class="col-sm-2 col-form-label">Première valeur de l'intervalle</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="from-f" name="from_f"
+                   placeholder="Première valeur de l'intervalle">
+        </div>
+    </div>
+    </div>
+    <div class="form-group row" for="to-f">
+        <label class="col-sm-2 col-form-label">Deuxième valeur de l'intervalle</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="to-f" name="to_f"
+                   placeholder="Deuxième valeur de l'intervalle">
+        </div>
+    </div>
+    <div>
+        <p style="padding-top: 10px;">Afin de choisir une catégorie, voici celles déjà créées : </p>
+        <ul>
+            {% for category in categories %}
+            <li>{{category.name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="form-group row" for="collection-category">
+        <label class="col-sm-2 col-form-label">Catégorie : </label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="collection-category" name="collection_category"
+                   placeholder="Choisissez une des catégories ci-dessus.">
+        </div>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+</form>
+
+<div>
+    <a href="{{url_for('create_category')}}" class="btn btn-primary" style="margin-top: 10px;">Pour créer une nouvelle
+        catégorie, cliquez-ici</a>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+        <div id="content" style="padding-top: 20px">
+          <img id="img_to_annotate" src="{{img.image_url}}" style="width: 45rem; height: auto">
+        </div>
+
+        <form method="post" role="form">
+        <button class="btn btn-primary" name="submit" id="submit">Envoyer les annotations au serveur</button>
+        </form>
+        <script>
+            $(document).ready(function(){
+
+                $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+
+            // Array Remove - By John Resig (MIT Licensed)
+            // https://johnresig.com/blog/javascript-array-remove/
+            Array.prototype.remove = function(from, to) {
+            var rest = this.slice((to || from) + 1 || this.length);
+            this.length = from < 0 ? this.length + from : from;
+            return this.push.apply(this, rest);
+            };
+
+            var annotations = [];
+
+            (function() {
+                var anno = Annotorious.init({
+                  image: 'img_to_annotate' // image element or ID
+                });
+
+                // Add event handlers using .on
+                anno.on('createAnnotation', function(annotation) {
+                  var annotation_to_push = annotation
+                  annotations.push(annotation_to_push);
+                  console.log(annotations);
+                  console.log('annotation créée');
+                });
+
+                anno.on('updateAnnotation', function(annotation) {
+                    var updated_annotation_json = annotation;
+                    var id_updated_annotation = updated_annotation_json['id'];
+                    console.log(id_updated_annotation);
+                    for (var i = 0; i < annotations.length; i++) {
+                        var obj = annotations[i];
+                        console.log(obj);
+                        for (var key in obj){
+                            var value = obj['id'];
+                            if (value == id_updated_annotation){
+                                annotations[i] = updated_annotation_json;
+                            }
+                        }
+                    }
+                    console.log(annotations)
+                    console.log("Annotation " + id_updated_annotation + " mise à jour")
+                });
+
+                anno.on('deleteAnnotation', function(annotation) {
+                    var deleted_annotation = annotation;
+                    for (var i = 0; i < annotations.length; i++) {
+                        if (annotations[i] == deleted_annotation) {
+                            annotations.remove(i)
+                        }
+                    }
+                    console.log(annotations)
+                    console.log("Annotation supprimée")
+                });
+
+          })()
+
+        $('#submit').bind('click', function() {
+           $.ajax({
+                 type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(annotations),
+                dataType: 'json',
+                url: '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}',
+                success: function (error) {
+                    console.log(error);
+                    window.location = $SCRIPT_ROOT + '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}';
+                },
+                error: function(error) {
+                console.log(error);
+            }
+            });
+        });
+        });
+
+        </script>
+
+</html>
+{% endblock %}
