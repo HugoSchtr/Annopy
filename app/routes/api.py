@@ -16,7 +16,6 @@ def Json_404():
 def api_collection_data(collection_id):
     try:
         query = Collection.query.get(collection_id)
-        print(query)
         return jsonify((query.to_json_api()))
     except:
         return Json_404()
