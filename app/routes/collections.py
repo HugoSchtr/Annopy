@@ -194,6 +194,25 @@ def create_collection_with_iiif():
     return render_template("pages/create_collection_with_iiif.html", categories=categories)
 
 
+@app.route("/collection/<int:collection_id>/update", methods=["POST", "GET"])
+@login_required
+def collection_update(collection_id):
+    collection = Collection.query.get(collection_id)
+
+    if request.method == "POST":
+        collection_name = request.form.get("collection_name", None)
+        collection_description = request.form.get("collection_description", None)
+        if collection_name:
+            collection.collection_name = request.form.get("collection_name", None)
+        if collection_description:
+            collection.collection_description = request.form.get("collection_description", None)
+
+        db.session.add(collection)
+        db.session.commit()
+
+    return render_template("pages/collection_update.html", collection=collection)
+
+
 @app.route("/create_category", methods=["POST", "GET"])
 @login_required
 def create_category():
