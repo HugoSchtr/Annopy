@@ -20,10 +20,10 @@ app = Flask(
     static_folder=statics
 )
 
-from .routes import generic, errors
+from .routes import generic, collections, errors, api
 
 def config_app(config_name="test"):
-    """ Create the application """
+    """ Création de l'application """
     app.config.from_object(CONFIG[config_name])
 
     # Set up extensions
