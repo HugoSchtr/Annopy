@@ -47,6 +47,7 @@
 <h2>Outils</h2>
 <ul>
     <li><a href="{{url_for('api_collection_data', collection_id=collection.collection_id)}}">Pour récupérer les annotations au format JSON, cliquez-ici.</a></li>
+    <li><a href="{{url_for('collection_update', collection_id=collection.collection_id)}}">Pour modifier la collection, cliquez-ici.</a></li>
     <li><a href="{{url_for('delete_collection', collection_id=collection.collection_id)}}">Pour supprimer la collection, cliquez-ici.</a></li>
 </ul>
 {% endif %}
