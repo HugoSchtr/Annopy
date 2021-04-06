@@ -2,8 +2,7 @@ import requests
 
 
 def ark_query(manifest, from_f, to_f):
-    """
-    Récupère une liste d'URL d'image à partir d'un manifest IIIF.
+    """ Récupère une liste d'URL d'image à partir d'un manifest IIIF.
 
     :param manifest: URL du manifest IIIF duquel seront récupérées les URL de chaque image.
     :type manifest: str

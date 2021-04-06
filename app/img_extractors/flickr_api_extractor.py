@@ -2,8 +2,7 @@ import requests
 
 
 def photoset_flickr_query(api_key, photoset_id, user_id):
-    """
-    Récupère une liste d'URL depuis un album Flickr via l'API de Flickr.
+    """ Récupère une liste d'URL depuis un album Flickr via l'API de Flickr.
     Chaque URL correspond à une image de ladite collection.
 
     :param api_key: API key pour utiliser l'API de Flickr.
