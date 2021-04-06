@@ -3,6 +3,7 @@ import datetime
 
 from .. app import db
 
+
 # Création de la table des collections
 class Collection(db.Model):
     __tablename__ = "collection"
@@ -118,49 +119,73 @@ class Collection(db.Model):
             },
         }
 
-
+# On crée la table des catégories
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer(), primary_key=True)
+    # Le nom de chaque catégorie doit être unique
     name = db.Column(db.String(50), unique=True)
+    # jointure avec la table CollectionHasCategories. Associe une catégorie à une collection.
+    # relation many to many
     has_collection = db.relationship("CollectionHasCategories", back_populates="category")
 
     @staticmethod
     def create(category_name):
+        """ Crée une catégorie. Retourne un typle (booléen, nouvelle Collection ou liste).
+        En cas d'erreur, renvoie False suivi de la liste des erreurs.
+        En cas de succès, renvoie True suivi de la donnée enregistrée.
+
+        :param collection_name: nom de la catégorie
+        :type collection_name: str
+        :param collection_description: description de la catégorie
+        :type collection_description: str
+        :return: tuple (booléen, nouvelle catégorie ou liste)
+        :rtype: tuple
+        """
+
+        # On crée la liste errors qui stockera les erreurs s'il y en a
         errors = []
+
+        # On vérifie qu'il y a un nom de catégorie.
+        # Le cas contraire, on met à jour la liste des erreurs.
         if not category_name:
             errors.append("Le nom de la catégorie est manquant.")
 
+        # Si la liste des erreurs n'est pas vide, renvoie False et la liste d'erreurs.
         if len(errors) > 0:
             return False, errors
 
+        # On vérifie que le nom de la catégorie n'est pas déjà pris.
         category_check = Collection.query.filter(Collection.collection_name.like("%"+category_name+"%")).first()
         if category_check:
             errors.append("Une collection porte déjà ce nom : " + category_name)
 
-        # Si on a au moins une erreur
+        # Si la liste des erreurs n'est pas vide, renvoie False et la liste d'erreurs.
         if len(errors) > 0:
             return False, errors
 
+        # On crée une nouvelle catégorie
         new_category = Category(
             name=category_name
         )
 
         try:
-            # On l'ajoute au transport vers la base de données
+            # On l'ajoute au transport vers la base de données.
             db.session.add(new_category)
-            # On envoie le paquet
+            # On renvoie la nouvelle collection
             db.session.commit()
 
-            # On renvoie l'utilisateur
+            # On renvoie la catégorie
             return True, new_category
         except Exception as erreur:
             return False, [str(erreur)]
 
     def to_json_api(self):
-        """ It ressembles a little JSON API format but it is not completely compatible
+        """ Retourne les données de la catégorie sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
 
-        :return:
+        :return: dictionnaire des données de la collection
+        :rtype: dict
         """
         return {
             "type": "category",
@@ -169,26 +194,41 @@ class Category(db.Model):
             }
         }
 
-
+# On crée la table d'association pour les collections et les catégories
 class CollectionHasCategories(db.Model):
     __tablename__ = "collection_categories"
     id = db.Column(db.Integer(), primary_key=True)
+    # Clé étrangère de la collection
     collection_id = db.Column(db.Integer(), db.ForeignKey('collection.collection_id'))
+    # Clé étrangère de la catégorie
     category_id = db.Column(db.Integer(), db.ForeignKey('categories.id'))
+    # Jointure avec la table Collection
     collection = db.relationship("Collection", back_populates="has_categories")
+    # Jointure avec la table Category
     category = db.relationship("Category", back_populates="has_collection")
 
     def category_to_json(self):
+        """ Retourne les données de l'association sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'association
+        :rtype: dict
+        """
         return {
             "category": self.category.to_json_api(),
         }
 
-
+# On crée la table Image
 class Image(db.Model):
     __tablename__ = "image"
     image_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     image_url = db.Column(db.Text, nullable=False)
+    # Jointure avec la table CollectionHasImages
+    # relation many to many
     has_collection = db.relationship("CollectionHasImages", back_populates="image")
+    # Jointure avec la table Annotation
+    # relation one to one
+    # Si l'image est supprimée, les annotations qui lui sont associées le seront également avec cascade="all, delete"
     annotation = db.relationship("Annotation", back_populates="image", cascade="all, delete")
 
     @staticmethod
