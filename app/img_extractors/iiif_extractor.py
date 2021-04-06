@@ -3,22 +3,27 @@ import requests
 
 def ark_query(manifest, from_f, to_f):
     """
-    From an ark identifier, a beginning folio number (from) and an ending folio number (to),
-    saves a list of image URLs located in the given interval, by requesting them
-    from Gallica's IIIF API. Also saves in a list the metadata of the given ark identifier.
-    :param ark: ark identifier from which images URL will get retrieve.
-    :type ark: str
-    :param from_f: beginning folio number for the download interval.
+    Récupère une liste d'URL d'image à partir d'un manifest IIIF.
+
+    :param manifest: URL du manifest IIIF duquel seront récupérées les URL de chaque image.
+    :type manifest: str
+    :param from_f: Premier chiffre de l'intervalle permettant de sélectionner une fourchette d'images.
     :type from_f: int
-    :param to_f: ending folio number for the download interval.
+    :param to_f: Deuxième chiffre de l'intervalle.
     :type to_f: int
-    :return: image URL list
+    :return: Liste des URL des images sélectionnées du manifest IIIF.
     :rtype: list
     """
 
+    # On crée une liste vide dans laquelle on pourra stocker les URL de chaque image.
     url_img_list = []
 
+    # On stocke la requête HTTP dans une variable r.
     r = requests.get(manifest)
+
+    # Si le code HTTP de la requête est 200 (success), r est converti en objet JSON et stocké dans data.
+    # Pour chaque image du manifest IIIF, on stocke dans img_url l'URL de l'image.
+    # Si la requête renvoie un autre code que 200, alors la fonction retourne False.
     if r.status_code == 200:
         data = r.json()
         for item in data['sequences']:
@@ -29,6 +34,8 @@ def ark_query(manifest, from_f, to_f):
     else:
         return False
 
+    # Afin d'améliorer l'expérience utilisateur-rice, on modifie la gestion des index de la liste.
+    # Puis, on slice url_img_list selon le choix de l'utilisateur-rice.
     if from_f == 1:
         from_f = 0
     if from_f > 1:
