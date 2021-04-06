@@ -1,54 +1,96 @@
 from flask import url_for
-from sqlalchemy.ext.mutable import MutableDict
 import datetime
 
 from .. app import db
 
+# Création de la table des collections
 class Collection(db.Model):
     __tablename__ = "collection"
     collection_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
+    # Le nom d'une collection doit être unique.
     collection_name = db.Column(db.String(45), unique=True, nullable=False)
     collection_description = db.Column(db.Text, nullable=False)
+    # jointure avec la table CollectionHasCategories, pour associer une collection à une catégorie.
+    # Relation many to many
     has_categories = db.relationship('CollectionHasCategories', back_populates="collection")
+    # jointure avec la table AuthorshipCollection, pour associer la création d'une collection à un utilisateur.
+    # relation many to many
+    # si la collection est supprimée, l'authorship est supprimé avec cascade="all, delete"
     collection_authorship = db.relationship("AuthorshipCollection", back_populates="collection", cascade="all, delete")
+    # jointure avec la table CollectionHasImages
+    # relation many to many
+    # si la collection est supprimée, suppression des images qui lui étaient associées.
     has_images = db.relationship("CollectionHasImages", back_populates="collection", cascade="all, delete")
 
     @staticmethod
     def create(collection_name, collection_description):
+        """ Crée une collection. Retourne un typle (booléen, nouvelle Collection ou liste).
+        En cas d'erreur, renvoie False suivi de la liste des erreurs.
+        En cas de succès, renvoie True suivi de la donnée enregistrée.
+
+        :param collection_name: nom de la collection
+        :type collection_name: str
+        :param collection_description: description de la collection
+        :type collection_description: str
+        :return: tuple (booléen, nouvelle Collection ou liste)
+        :rtype: tuple
+        """
+
+        # On crée la liste errors qui stockera les erreurs s'il y en a
         errors = []
+
+        # On vérifie qu'il y a un nom de collection et une description.
+        # Le cas contraire, on met à jour la liste des erreurs.
         if not collection_name:
             errors.append("Le nom de la collection est manquant.")
         if not collection_description:
             errors.append("La description de la collection est manquante.")
 
+        # Si la liste des erreurs n'est pas vide, renvoie False et la liste d'erreurs.
         if len(errors) > 0:
             return False, errors
 
+        # On vérifie que le nom de la collection n'est pas déjà pris.
         collection_name_check = Collection.query.filter(Collection.collection_name.like("%"+collection_name+"%")).first()
         if collection_name_check:
             errors.append("Une collection porte déjà ce nom : " + collection_name)
 
-        # Si on a au moins une erreur
+        # Si la liste des erreurs n'est pas vide, renvoie False et la liste d'erreurs.
         if len(errors) > 0:
             return False, errors
 
+        # On crée une nouvelle collection
         new_collection = Collection(
             collection_name=collection_name,
             collection_description=collection_description,
         )
 
         try:
+            # On l'ajoute au transport vers la base de données.
             db.session.add(new_collection)
+            # On commit
             db.session.commit()
 
+            # On renvoie la nouvelle collection
             return True, new_collection
         except Exception as erreur:
             return False, [str(erreur)]
 
     def get_id(self):
+        """ Retourne l'ID de l'objet actuellement utilisé
+
+        :return: ID de la collection
+        :rtype: int
+        """
         return self.collection_id
 
     def to_json_api(self):
+        """ Retourne les données de la collection sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de la collection
+        :rtype: dict
+        """
         return {
             "type": "collection",
             "id": self.collection_id,
