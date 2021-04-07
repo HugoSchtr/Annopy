@@ -15,7 +15,7 @@ Routes pour l'API, dans l'ordre:
 def json_404():
     """ Gère les erreurs 404 pour l'API.
 
-    :return: HTML response
+    :return: HTTP response
     """
     response = jsonify({"erreur": "Unable to perform the query"})
     response.status_code = 404
@@ -45,7 +45,7 @@ def api_collection_data(collection_id):
         # On convertit la réponse de la fonction au format JSON avec la fonction jsonify()
         return jsonify((query.to_json_api()))
     except:
-        # S'il y a une erreur, si la collection n'existe pas, on lance une erreur HTML 404
+        # S'il y a une erreur, si la collection n'existe pas, on lance une erreur HTTP 404
         return json_404()
 
 
@@ -71,5 +71,5 @@ def api_image_data(image_id):
         # On convertit la réponse de la fonction au format JSON avec la fonction jsonify()
         return jsonify((query.to_json_api()))
     except:
-        # S'il y a une erreur, si l'image n'existe pas, on lance une erreur HTML 404
+        # S'il y a une erreur, si l'image n'existe pas, on lance une erreur HTTP 404
         return json_404()
