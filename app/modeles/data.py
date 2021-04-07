@@ -137,10 +137,8 @@ class Category(db.Model):
         En cas d'erreur, renvoie False suivi de la liste des erreurs.
         En cas de succès, renvoie True suivi de la donnée enregistrée.
 
-        :param collection_name: nom de la catégorie
-        :type collection_name: str
-        :param collection_description: description de la catégorie
-        :type collection_description: str
+        :param category_name: nom de la catégorie
+        :type category_name: str
         :return: tuple (booléen, nouvelle catégorie ou liste)
         :rtype: tuple
         """
