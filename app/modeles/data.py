@@ -5,6 +5,7 @@ from .. app import db
 
 
 # Création de la table des collections
+# La class hérite de la classe db.Model. Ce commentaire vaut pour toutes les autres classes du dossier modeles
 class Collection(db.Model):
     __tablename__ = "collection"
     collection_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -119,6 +120,7 @@ class Collection(db.Model):
             },
         }
 
+
 # On crée la table des catégories
 class Category(db.Model):
     __tablename__ = 'categories'
@@ -172,7 +174,7 @@ class Category(db.Model):
         try:
             # On l'ajoute au transport vers la base de données.
             db.session.add(new_category)
-            # On renvoie la nouvelle collection
+            # On commit
             db.session.commit()
 
             # On renvoie la catégorie
@@ -184,7 +186,7 @@ class Category(db.Model):
         """ Retourne les données de la catégorie sous forme de dictionnaire
         pour leur exploitation au format JSON via l'API.
 
-        :return: dictionnaire des données de la collection
+        :return: dictionnaire des données de la catégorie
         :rtype: dict
         """
         return {
@@ -194,7 +196,8 @@ class Category(db.Model):
             }
         }
 
-# On crée la table d'association pour les collections et les catégories
+
+# On crée la table d'association CollectionHasCategories pour les collections et les catégories
 class CollectionHasCategories(db.Model):
     __tablename__ = "collection_categories"
     id = db.Column(db.Integer(), primary_key=True)
@@ -218,6 +221,7 @@ class CollectionHasCategories(db.Model):
             "category": self.category.to_json_api(),
         }
 
+
 # On crée la table Image
 class Image(db.Model):
     __tablename__ = "image"
@@ -233,29 +237,47 @@ class Image(db.Model):
 
     @staticmethod
     def create(image_url):
-        error = []
-        if not image_url:
-            error.append("L'URL de l'image est manquant.")
+        """ Crée une image. Retourne un typle (booléen, nouvelle Image ou liste).
+        En cas d'erreur, renvoie False suivi de la liste des erreurs.
+        En cas de succès, renvoie True suivi de la donnée enregistrée.
 
-        if len(error) > 0:
-            return False, error
+        :param image_url: URL de la nouvelle image
+        :type image_url: str
+        :return: tuple (booléen, nouvelle Image ou liste)
+        :rtype: tuple
+        """
 
+        # On crée la nouvelle image
         new_image = Image(
             image_url=image_url
         )
 
         try:
+            # On l'ajoute au transport vers la base de données.
             db.session.add(new_image)
+            # On commit
             db.session.commit()
-
+            # On renvoie la nouvele image
             return True, new_image
+
         except Exception as erreur:
             return False, [str(erreur)]
 
     def get_id(self):
+        """ Retourne l'ID de l'objet actuellement utilisé
+
+        :return: ID de l'image
+        :rtype: int
+        """
         return self.image_id
 
     def to_json_api(self):
+        """ Retourne les données de l'image sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'image
+        :rtype: dict
+        """
         return {
             "type": "image",
             "attributes": {
@@ -263,6 +285,7 @@ class Image(db.Model):
                 "url": self.image_url,
                 "annotations":
                 [
+                    # on affiche chaque annotation associée à l'image concernée, grâce à la jointure
                     annotation.to_json_api()
                     for annotation in self.annotation
                 ]
@@ -270,15 +293,29 @@ class Image(db.Model):
         }
 
 
+# On crée la table Annotation
 class Annotation(db.Model):
     __tablename__ = "annotation"
     annotation_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
+    # Les annotations, générées au format JSON par Annotorious avec JavaScript, sont stockées en tant que str
     annotation_json = db.Column(db.Text, nullable=False)
+    # Clé étrangère de l'image à laquelle est associée l'annotation
     annotation_image_id = db.Column(db.Integer, db.ForeignKey("image.image_id"))
+    # Jointure avec la table Image
+    # relation one to one
     image = db.relationship("Image", back_populates="annotation")
+    # Jointure avec la table AuthorshipAnnotation.
+    # Relation many to many
+    # Si l'annotation est supprimée, l'authorship l'est également avec cascade="all, delete".
     annotation_authorship = db.relationship("AuthorshipAnnotation", back_populates="annotation", cascade="all, delete")
 
     def to_json_api(self):
+        """ Retourne les données de l'annotation sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'annotation
+        :rtype: dict
+        """
         return {
             "type": "annotation",
             "attributes": {
@@ -286,6 +323,7 @@ class Annotation(db.Model):
                 "json": self.annotation_json,
                 "relationships": {
                     "editions": [
+                        # On affiche l'authorship de l'annotation grâce à la jointure
                         author.author_anno_to_json()
                         for author in self.annotation_authorship
                     ]
@@ -294,44 +332,77 @@ class Annotation(db.Model):
         }
 
 
+# On crée la table d'association AuthorshipCollection pour les collections et les users
 class AuthorshipCollection(db.Model):
     authorship_collection_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
+    # Clé étrangère de la collection
     authorship_collection_collection_id = db.Column(db.Integer, db.ForeignKey('collection.collection_id'))
+    # Clé étrangère du user
     authorship_collection_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     authorship_collection_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # Jointure avec la table User
     user = db.relationship("User", back_populates="authorship_collection")
+    # Jointure avec la table Collection
     collection = db.relationship("Collection", back_populates="collection_authorship")
 
     def author_to_json(self):
+        """ Retourne les données de l'association sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'association
+        :rtype: dict
+        """
         return {
             "author": self.user.to_json_api(),
             "on": self.authorship_collection_date
         }
 
 
+# On crée la table d'association AuthorshipAnnotation pour les annotations et les users
 class AuthorshipAnnotation(db.Model):
     authorship_annotation_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
+    # Clé étrangère du user
     authorship_annotation_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    # Clé étrangère de l'annotation
     authorship_annotation_annotation_id = db.Column(db.Integer, db.ForeignKey('annotation.annotation_id'))
     authorship_annotation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # Jointure avec la table User
     user = db.relationship("User", back_populates="authorship_annotation")
+    # Jointure avec la table Annotation
     annotation = db.relationship("Annotation", back_populates="annotation_authorship", cascade="all, delete")
 
     def author_anno_to_json(self):
+        """ Retourne les données de l'association sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'association
+        :rtype: dict
+        """
         return {
             "author": self.user.to_json_api(),
             "on": self.authorship_annotation_date
         }
 
 
+# On crée la table d'association CollectionHasImages pour les collections et les images
 class CollectionHasImages(db.Model):
     collection_has_images_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
+    # Clé étrangère de la collection
     collection_has_images_collection_id = db.Column(db.Integer, db.ForeignKey('collection.collection_id'))
+    # Clé étrangère de l'image
     collection_has_images_image_id = db.Column(db.Integer, db.ForeignKey('image.image_id'))
+    # Jointure avec la table Collection
     collection = db.relationship("Collection", back_populates="has_images")
+    # Jointure avec la table Image
     image = db.relationship("Image", back_populates="has_collection", cascade="all, delete")
 
     def image_to_json(self):
+        """ Retourne les données de l'association sous forme de dictionnaire
+        pour leur exploitation au format JSON via l'API.
+
+        :return: dictionnaire des données de l'association
+        :rtype: dict
+        """
         return {
             "image": self.image.to_json_api()
         }
