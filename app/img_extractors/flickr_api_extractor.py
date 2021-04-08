@@ -67,10 +67,10 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
         secret = idx[1]
         server = idx[2]
         url_list.append("https://live.staticflickr.com/{0}/{1}_{2}_{3}.jpg".format(server, id, secret, "b"))
-    print(url_list)
 
     return url_list
 
 
 # imgs = photoset_flickr_query("e75749d1274235bdac7667545e19a86d", "72157718781176996", "192476676@N05")
 # On teste la fonction
+# print(imgs)

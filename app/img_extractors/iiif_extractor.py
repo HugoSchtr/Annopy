@@ -44,5 +44,6 @@ def ark_query(manifest, from_f, to_f):
     return url_img_list
 
 
-# ark_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", 0, 2)
+# imgs = ark_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", 0, 4)
 # Test de la fonction
+# print(imgs)
