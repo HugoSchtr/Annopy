@@ -122,16 +122,28 @@
 
           })()
 
-        // Requête AJAX (to do)
+        // Requête AJAX envoyant les données au server avec une requête HTTP POST.
+        // "AJAX is a technique for accessing web servers from a web page."
+        // (https://www.w3schools.com/js/js_ajax_intro.asp)
+        // La requête est envoyée lorsque l'utilisateur-ice clique sur le bouton possédant l'ID 'submit'
         $('#submit').bind('click', function() {
            $.ajax({
-                 type: 'POST',
+                // On indique le type de requête HTTP, 'Post' ici
+                type: 'POST',
+                // Le type de data envoyée au serveur, JSON ici
                 contentType: 'application/json',
+                // Data envoyée au serveur
+                // On transforme l'array annotation grâce à la méthode JSON.stringify() qui convertit
+                // un objet JavaScript ou une valeur en une chaîne de caractères JSON.
                 data: JSON.stringify(annotations),
+                // dataType indique le type de data que la requête AJAX attend du serveur en retour.
+                // Ici, du JSON.
                 dataType: 'json',
+                // Une chaîne de caractères qui contient l'URL vers laquelle est envoyée la requête
                 url: '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}',
-                success: function (error) {
-                    console.log(error);
+               // fonctions JavaScript si la requête AJAX réussi ou échoue
+                success: function (success) {
+                    console.log(success);
                     window.location = '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}';
                 },
                 error: function(error) {
