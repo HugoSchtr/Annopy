@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect
+from flask import render_template, request, flash, redirect, json
 from flask_login import current_user, login_required
 
 from ..app import app
@@ -286,8 +286,19 @@ def collection(collection_id):
     imgs = Collection.query.get(collection_id).has_images
     if current_user.is_authenticated is True:
         for img in imgs:
+            check = []
             annotations = img.image.annotation
-            print(annotations)
+            for annotation in annotations:
+                check = AuthorshipAnnotation.query.filter(db.and_(
+                    AuthorshipAnnotation.authorship_annotation_annotation_id == annotation.annotation_id,
+                    AuthorshipAnnotation.authorship_annotation_user_id == current_user.user_id
+                )
+                ).first()
+            if check:
+                print(check)
+            else:
+                print("no")
+
 
     if current_user.is_authenticated is not True:
         flash("Vous devez vous connecter pour pouvoir voir et annoter les images de cette collection.", 'info')
@@ -312,7 +323,8 @@ def viewer(collection_id, image_id):
             img = Image.query.get(image_id)
             for annotation in annotations:
                 annotation_to_be_added = Annotation(
-                    annotation_json=str(annotation),
+                    # On transforme le dictionnaire annotation en une chaine de caractère formatée JSON
+                    annotation_json=json.dumps(annotation),
                     image=img
                 )
 
@@ -329,6 +341,6 @@ def viewer(collection_id, image_id):
                 db.session.commit()
 # trouver moyen de dire quand il n'y a pas d'annotation de créé
         flash("l'annotation a bien été enregistrée !", "success")
-        return redirect("/collection/" + str(collection_id))
+        return redirect("/collection/" + str(collection_id)), json.dumps({'status':'OK', 'annotations':annotations})
 
     return render_template("pages/viewer_annotations.html", img=img, img_id=img_id, collection_id=collection_id)
