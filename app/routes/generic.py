@@ -205,6 +205,9 @@ def community():
     else:
         page = 1
 
+    # .paginate() permet de paginer le résultat de la requête selon les deux paramètres page et per_page
+    # page étant le numéro de la page
+    # per_page étant le nombre de résultats par page
     resultats = User.query.paginate(page=page, per_page=8)
 
     return render_template("pages/community.html", resultats=resultats)
