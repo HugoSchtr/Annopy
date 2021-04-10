@@ -284,24 +284,10 @@ def collection(collection_id):
     authorships = Collection.query.get(collection_id).collection_authorship
     categories = Collection.query.get(collection_id).has_categories
     imgs = Collection.query.get(collection_id).has_images
-    if current_user.is_authenticated is True:
-        for img in imgs:
-            check = []
-            annotations = img.image.annotation
-            for annotation in annotations:
-                check = AuthorshipAnnotation.query.filter(db.and_(
-                    AuthorshipAnnotation.authorship_annotation_annotation_id == annotation.annotation_id,
-                    AuthorshipAnnotation.authorship_annotation_user_id == current_user.user_id
-                )
-                ).first()
-            if check:
-                print(check)
-            else:
-                print("no")
-
 
     if current_user.is_authenticated is not True:
         flash("Vous devez vous connecter pour pouvoir voir et annoter les images de cette collection.", 'info')
+
     return render_template("pages/collection.html", collection=collection, authorships=authorships,
                            categories=categories, imgs=imgs, Annotation=Annotation, AuthorshipAnnotation=AuthorshipAnnotation, db=db)
 
@@ -339,7 +325,7 @@ def viewer(collection_id, image_id):
                 )
                 db.session.add(authorship_annotation)
                 db.session.commit()
-# trouver moyen de dire quand il n'y a pas d'annotation de créé
+
         flash("l'annotation a bien été enregistrée !", "success")
         return redirect("/collection/" + str(collection_id)), json.dumps({'status':'OK', 'annotations':annotations})
 
