@@ -39,6 +39,10 @@ def create_collection():
 @app.route("/create_collection_flickr_api", methods=["POST", "GET"])
 @login_required
 def create_collection_with_flickr():
+    """ Route permettant la création d'une collection avec l'API de Flickr
+
+    :return:
+    """
     categories = Category.query.all()
     # On récupère toutes les catégories pour les afficher sur le template
     if request.method == "POST":
