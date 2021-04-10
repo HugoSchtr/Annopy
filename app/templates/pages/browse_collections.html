@@ -18,7 +18,7 @@
         {% if page %}
         {% if page != resultats.page %}
         <li class="page-item">
-            <a class="page-link" href="{{url_for('browse_collection', page=page)}}">{{page}}</a>
+            <a class="page-link" href="{{url_for('browse_collections', page=page)}}">{{page}}</a>
         </li>
         {% else %}
         <li class="page-item active disabled">
