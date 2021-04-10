@@ -123,7 +123,7 @@ def profile():
         # Les deux if suivants permettent de vérifier si forename et surname ne sont pas None.
         # Si l'un des deux n'est pas none, on modifie la donnée en base en fonction de celui-ci
         # Cela permet de changer son prénom ou son nom de famille sans effacer l'un ou l'autre
-        # si on ne modifie pas les deux informations.
+        # si on ne modifie pas les deux informations en même temps.
         if forename:
             current_user.user_forename = request.form.get("forename", None)
         if surname:
@@ -177,8 +177,8 @@ def password_update():
 def sign_out():
     """ Route pour déconnecter l'utilisateur-ice
 
-    :return: redirect
-    :rtype: template
+    :return: /
+    :rtype: response object
     """
 
     # Si l'utilisateur-ice courant-e est identifiée (True), on le/la déconnecte avec la fonction logout_user()
