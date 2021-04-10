@@ -1,5 +1,7 @@
-from flask import url_for
+from flask import url_for, jsonify
 import datetime
+import json
+
 
 from .. app import db
 
@@ -315,11 +317,15 @@ class Annotation(db.Model):
         :return: dictionnaire des données de l'annotation
         :rtype: dict
         """
+
         return {
             "type": "annotation",
             "attributes": {
                 "id": self.annotation_id,
-                "json": self.annotation_json,
+                "annotation_json": [
+                    # On transforme la chaîne de caractère formatée JSON enregistrée en base de données en objet JSON
+                    json.loads(self.annotation_json)
+                ],
                 "relationships": {
                     "editions": [
                         # On affiche l'authorship de l'annotation grâce à la jointure
