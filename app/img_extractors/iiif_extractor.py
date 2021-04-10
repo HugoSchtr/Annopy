@@ -17,6 +17,15 @@ def ark_query(manifest, from_f, to_f):
     # On crée une liste vide dans laquelle on pourra stocker les URL de chaque image.
     url_img_list = []
 
+    # On convertit les from_f et to_f en integer.
+    # Si l'utilisateur a donné des chaînes de caractères qui ne peuvent pas être convertis en integer
+    # (lettres, caractères spéciaux), on renvoie False.
+    try:
+        from_f = int(from_f)
+        to_f = int(to_f)
+    except ValueError:
+        return False
+
     # On stocke la requête HTTP dans une variable r.
     r = requests.get(manifest)
 
@@ -44,6 +53,6 @@ def ark_query(manifest, from_f, to_f):
     return url_img_list
 
 
-# imgs = ark_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", 0, 4)
+imgs = ark_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", "1", 4)
 # Test de la fonction
-# print(imgs)
+print(imgs)
