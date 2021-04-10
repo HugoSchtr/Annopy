@@ -297,7 +297,8 @@ class Image(db.Model):
 class Annotation(db.Model):
     __tablename__ = "annotation"
     annotation_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
-    # Les annotations, générées au format JSON par Annotorious avec JavaScript, sont stockées en tant que str.
+    # Les annotations, générées au format JSON par Annotorious avec JavaScript, sont stockées
+    # en tant que chaîne de caractères formatées à l'insertion.
     # Voir https://recogito.github.io/annotorious/getting-started/web-annotation/
     annotation_json = db.Column(db.Text, nullable=False)
     # Clé étrangère de l'image à laquelle est associée l'annotation
