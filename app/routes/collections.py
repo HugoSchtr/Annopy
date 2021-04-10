@@ -110,12 +110,13 @@ def create_collection_with_iiif():
 
     if request.method == "POST":
         chosen_category = request.form.get("collection_category")
+
         # On récupère la catégorie entrée par l'utilsiateur.ice sur le template
         manifest_iiif = request.form.get("manifest_iiif", None)
+
         from_f = request.form.get("from_f", None)
-        from_f = int(from_f)
         to_f = request.form.get("to_f", None)
-        to_f = int(to_f) # Problème de conversion
+
         if not manifest_iiif:
             flash("Il manque des informations pour récupérer les images.")
             return redirect("/create_collection_iiif", "error")
