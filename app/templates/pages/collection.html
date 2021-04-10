@@ -5,8 +5,9 @@
 {% block body %}
 
 {% if collection %}
-<h1>{{collection.collection_name}}</h1>
-<dl>
+    <h1>{{collection.collection_name}}</h1>
+
+    <dl>
     <dt>Catégorie</dt>
     {% for category in categories %}
     <dd>{{category.category.name}}</dd>
@@ -23,41 +24,59 @@
     {% endfor %}
     {% if current_user.is_authenticated %}
     <dt>Images</dt>
+
     {% for img in imgs %}
-    <dd>        <ol><li>Image {{loop.index}} :
-        <a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">Pour annoter cette image, cliquez-ici.</a>
-        </br>
-            <p>Pour accéder aux données de cette image : <a href="{{url_for('api_image_data', image_id=img.image.image_id)}}">API</a></li></p>
+    {% set check = [] %}
+    <dd>
+        <ol>
+            <li>Image {{loop.index}} :</li>
+                <ul>
+
         {% set annotations = img.image.annotation %}
         {% if annotations %}
         {% for annotation in annotations %}
-            {% set annotation_authorship = Annotation.query.get(annotation.annotation_id).annotation_authorship %}
-            {% for authorship in annotation_authorship %}
-                {% if authorship.user.user_id == current_user.user_id %}
-                    Déjà annotée
-                {% endif %}
+            {% set authorship = AuthorshipAnnotation.query.filter(db.and_(
+            AuthorshipAnnotation.authorship_annotation_annotation_id == annotation.annotation_id,
+            AuthorshipAnnotation.authorship_annotation_user_id == current_user.user_id)
+            ).first() %}
+            {% if authorship %}
+                {% set check = check.append(1) %}
+            {% endif %}
         {% endfor %}
-        {% endfor %}
-        {%endif%}
+
+        {% if check %}
+                    <li>Vous avez déjà annotée cette image. Nous vous remercions pour votre collaboration.</li>
+        {% else %}
+                    <li><a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">Pour annoter cette image, cliquez-ici.</a></li>
+        {% endif %}
+                    <li>Pour accéder aux données de cette image : <a href="{{url_for('api_image_data', image_id=img.image.image_id)}}">API</a></li>
+        </ul>
+        {% else %}
+            <ul>
+            <li><a href="{{url_for('viewer',collection_id=collection.collection_id, image_id=img.image.image_id)}}">Pour annoter cette image, cliquez-ici.</a></li>
+            </ul>
+        {% endif %}
     </ol>
     </dd>
     {% endfor %}
     {% else %}
     <dt>Images</dt>
     <dd>Il y a {{imgs|length}} image(s) prêtes à être annotée(s) une fois que vous serez connecté-e !</dd>
+    </dl>
     {% endif %}
-</dl>
+
 {% if current_user.is_authenticated %}
-<h2>Outils</h2>
-<ul>
-    <li><a href="{{url_for('api_collection_data', collection_id=collection.collection_id)}}">Pour récupérer la collection au format JSON via l'API, cliquez-ici (données de la collection, données des images, données des annotations).</a></li>
-    <li><a href="{{url_for('collection_update', collection_id=collection.collection_id)}}">Pour modifier la collection, cliquez-ici.</a></li>
-    <li><a href="{{url_for('delete_collection', collection_id=collection.collection_id)}}">Pour supprimer la collection, cliquez-ici.</a></li>
-</ul>
+    <h2>Outils</h2>
+    <ul>
+        <li><a href="{{url_for('api_collection_data', collection_id=collection.collection_id)}}">Pour récupérer la collection au format JSON via l'API, cliquez-ici (données de la collection, données des images, données des annotations).</a></li>
+        <li><a href="{{url_for('collection_update', collection_id=collection.collection_id)}}">Pour modifier la collection, cliquez-ici.</a></li>
+        <li><a href="{{url_for('delete_collection', collection_id=collection.collection_id)}}">Pour supprimer la collection, cliquez-ici.</a></li>
+    </ul>
 {% endif %}
 {% else %}
-<p>Il n'y a pas encore de collection.</p>
+    <p>Il n'y a pas encore de collection.</p>
 {% endif %}
+
 <p><a href="{{url_for('homepage')}}">Retour à la page d'accueil</a></p>
 
 {% endblock %}
