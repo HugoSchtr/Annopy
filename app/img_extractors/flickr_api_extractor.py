@@ -71,6 +71,6 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
     return url_list
 
 
-# imgs = photoset_flickr_query("e75749d1274235bdac7667545e19a86d", "72157718781176996", "192476676@N05")
 # On teste la fonction
+# imgs = photoset_flickr_query("e75749d1274235bdac7667545e19a86d", "72157718781176996", "192476676@N05")
 # print(imgs)

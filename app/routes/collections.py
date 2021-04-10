@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from ..app import app
 from ..modeles.data import *
 from app.img_extractors.flickr_api_extractor import photoset_flickr_query
-from app.img_extractors.iiif_extractor import ark_query
+from app.img_extractors.iiif_extractor import iiif_query
 
 """
 Routes gérant les collections dans l'app:
@@ -41,16 +41,25 @@ def create_collection():
 def create_collection_with_flickr():
     """ Route permettant la création d'une collection avec l'API de Flickr
 
-    :return:
+    :return: create_collection_with_flickr.html
+    :rtype: template
     """
-    categories = Category.query.all()
     # On récupère toutes les catégories pour les afficher sur le template
+    categories = Category.query.all()
+
+    # Si la requête HTTP est POST, on crée une collection
     if request.method == "POST":
+        # On récupère la catégorie entrée par l'utilisateur-ice sur le template
         chosen_category = request.form.get("collection_category")
-        # On récupère la catégorie entrée par l'utilsiateur.ice sur le template
+        # On récupère les éléments nécessaires pour faire une requête à l'API Flickr
+        # La API key, fournie par Flickr aux utilisateurs demandant un accès à l'API
+        # L'ID de l'album, qui correspond à l'identifiant d'un album créé par un-e utilisateur-ice sur Flickr
+        # L'user ID Flickr, qui correspond à l'identifiant de l'utilisateur-ice à qui appartient l'album
         api_key = request.form.get("api_key", None)
         album_id = request.form.get("album_id", None)
         flickr_user_id = request.form.get("user_id", None)
+        # S'il manque les informations nécessaires (valeur des variables précédentes = None),
+        # on alerte l'utilisateur-ice qu'il manque des informations nécessaires.
         if not api_key:
             flash("Il manque des informations pour récupérer les images depuis Flickr.", "error")
             return redirect("/create_collection_flickr_api")
@@ -61,53 +70,66 @@ def create_collection_with_flickr():
             flash("Il manque des informations pour récupérer les images depuis Flickr.", "error")
             return redirect("/create_collection_flickr_api")
 
+        # Si tous les paramètres nécessaires à la fonction photoset_flickr_query sont présents,
+        # on stocke la liste d'URL dans imgs_url
         imgs_url = photoset_flickr_query(api_key, album_id, flickr_user_id)
 
+        # Il est possible qu'il y ait une erreur lors de la récupération des images
+        # (API key erronée, user ID inexistant, etc.). Dans ce cas, on envoie un message d'erreur avec flash() et
+        # on redirige l'utilisateur-ice vers un nouveau formulaire de création.
         if not imgs_url:
             flash(
                 "Il y a eu une erreur dans la récupération des images via l'API Flickr, vérifiez les informations fournies.",
                 "error")
             return redirect("/create_collection_flickr_api")
 
+        # On fait une recherche filtrée pour récupérer la catégorie choisie par l'utilisateur-ice.
+        # ("%" + chosen_category + "%") permet de donner de la souplesse à ce système en le rendant insensible
+        # à la casse.
         category_check = Category.query.filter(Category.name.like("%" + chosen_category + "%")).count()
+        # Si la requête n'a pas compté de catégorie semblable, cela signifie que la catégorie n'existe pas.
+        # La création de collection est impossible.
+        # On envoie un message au template avec flash() pour informer l'utilisateur-ice.
         if category_check == 0:
             flash("Vous n'avez pas entré de catégorie ou celle-ci n'existe pas.", "error")
             return redirect("/create_collection_flickr_api")
+        # S'il y a au moins un résultat, on fait une nouvelle requête et on stocke le premier objet donné par la
+        # requête dans category.
         else:
             category = Category.query.filter(Category.name.like("%" + chosen_category + "%")).first()
-            # Une fois le formulaire envoyée en méthode POST, on vérifie que la catégorie choisie existe.
-            # Si elle n'existe pas, la fonction retourne un message d'erreur avec flash().
-            # Si elle existe, on récupère l'objet correspondant dans la base de données.
 
+            # On lance la création de la nouvelle collection avec la méthode .create()
             status, data = Collection.create(
                 collection_name=request.form.get("collection_name", None),
                 collection_description=request.form.get("collection_description", None)
             )
-            # Si la catégorie existe, on lance la création de la collection avec la static method Collection.create().
 
+            # On arrête le processus de création de collection si la méthode a retourné False.
             if status is False:
                 flash("Erreur : " + ", ".join(data), "error")
                 return render_template("pages/create_collection_with_flickr.html", categories=categories)
 
-            collection = Collection.query.order_by(Collection.collection_id.desc()).limit(1).first()
             # On récupère la dernière collection en base, celle qui vient d'être créée.
+            collection = Collection.query.order_by(Collection.collection_id.desc()).limit(1).first()
 
+            # On associe l'utilisateur-ice à la collection qu'il/elle vient de créer avec la table AuthorshipCollection.
             authorship = AuthorshipCollection(
                 collection=collection,
                 user=current_user
             )
             db.session.add(authorship)
             db.session.commit()
-            # On associe l'utilisateur à la collection qu'il vient de créer avec la table AuthorshipCollection.
 
+            # On associe la collection à la catégorie choisie par l'utilisateur.ice.
             collection_has_categories = CollectionHasCategories(
                 collection=collection,
                 category=category
             )
             db.session.add(collection_has_categories)
             db.session.commit()
-            # On associe la collection à la catégorie choisie par l'utilisateur.ice.
 
+            # On itère sur les URL contenues dans imgs_url pour les stocker en base.
+            # Cela servira à les afficher lorsqu'il sera question de les annoter.
             for url in imgs_url:
                 Image.create(
                     image_url=url
@@ -132,18 +154,29 @@ def create_collection_with_flickr():
 @app.route("/create_collection_iiif", methods=["POST", "GET"])
 @login_required
 def create_collection_with_iiif():
-    categories = Category.query.all()
+    """ Route permettant la création d'une collection à l'aide d'un manifest IIIF
+
+    :return: create_collection_with_iiif.html
+    :rtype: template
+    """
     # On récupère toutes les catégories pour les afficher sur le template
+    categories = Category.query.all()
 
+    # Si la requête HTTP est POST, on crée une collection
     if request.method == "POST":
+        # On récupère la catégorie entrée par l'utilisateur-ice sur le template
         chosen_category = request.form.get("collection_category")
-
-        # On récupère la catégorie entrée par l'utilsiateur.ice sur le template
+        # On récupère les éléments nécessaires pour récupérer les URL des images depuis un manifest IIIF
+        # avec la fonction ark_query.
+        # manfifest_iiif est un lien renvoyant vers un manifest IIIF (JSON)
+        # from_f est un chiffre indiquant depuis quelle image l'intervalle débute
+        # to_f est un chiffre indiquant à quelle image l'intervalle se termine
+        # La fonction permettra de récupérer les URL des images se trouvant dans l'intervalle
         manifest_iiif = request.form.get("manifest_iiif", None)
-
         from_f = request.form.get("from_f", None)
         to_f = request.form.get("to_f", None)
-
+        # S'il manque les informations nécessaires (valeur des variables précédentes = None),
+        # on alerte l'utilisateur-ice qu'il manque des informations nécessaires.
         if not manifest_iiif:
             flash("Il manque des informations pour récupérer les images.")
             return redirect("/create_collection_iiif", "error")
@@ -154,53 +187,67 @@ def create_collection_with_iiif():
             flash("Il manque des informations pour récupérer les images.")
             return redirect("/create_collection_iiif", "error")
 
-        imgs_url = ark_query(manifest_iiif, from_f, to_f)
+        # Si tous les paramètres nécessaires à la fonction iiif_query sont présents,
+        # on stocke la liste d'URL dans imgs_url
+        imgs_url = iiif_query(manifest_iiif, from_f, to_f)
 
+        # Il est possible qu'il y ait une erreur lors de la récupération des images
+        # (lien invalide, serveur iiif indisponible, manifest non libre de droits, pas d'entiers pour l'intervalle).
+        # Dans ce cas, on envoie un message d'erreur avec flash() et
+        # on redirige l'utilisateur-ice vers un nouveau formulaire de création.
         if not imgs_url:
             flash(
                 "Il y a eu une erreur dans la récupération des images. Il se peut que votre lien soit invalide, que le serveur que vous essayez de consulter est indisponible, que le manifest IIIF n'est pas libre de droits, ou que vous n'ayez pas entré d'entiers pour l'intervalle.",
                 "error")
             return redirect("/create_collection_iiif")
 
+        # On fait une recherche filtrée pour récupérer la catégorie choisie par l'utilisateur-ice.
+        # ("%" + chosen_category + "%") permet de donner de la souplesse à ce système en le rendant insensible
+        # à la casse.
         category_check = Category.query.filter(Category.name.like("%" + chosen_category + "%")).count()
+        # Si la requête n'a pas compté de catégorie semblable, cela signifie que la catégorie n'existe pas.
+        # La création de collection est impossible.
+        # On envoie un message au template avec flash() pour informer l'utilisateur-ice.
         if category_check == 0:
             flash("Vous n'avez pas entré de catégorie ou celle-ci n'existe pas.", "error")
             return redirect("/create_collection_iiif")
+        # S'il y a au moins un résultat, on fait une nouvelle requête et on stocke le premier objet donné par la
+        # requête dans category.
         else:
             category = Category.query.filter(Category.name.like("%" + chosen_category + "%")).first()
-            # Une fois le formulaire envoyée en méthode POST, on vérifie que la catégorie choisie existe.
-            # Si elle n'existe pas, la fonction retourne un message d'erreur avec flash().
-            # Si elle existe, on récupère l'objet correspondant dans la base de données.
 
+            # On lance la création de la nouvelle collection avec la méthode .create()
             status, data = Collection.create(
                 collection_name=request.form.get("collection_name", None),
                 collection_description=request.form.get("collection_description", None)
             )
-            # Si la catégorie existe, on lance la création de la collection avec la static method Collection.create().
 
+            # On arrête le processus de création de collection si la méthode a retourné False.
             if status is False:
                 flash("Erreur : " + ", ".join(data), "error")
                 return render_template("pages/create_collection_with_iiif.html", categories=categories)
 
-            collection = Collection.query.order_by(Collection.collection_id.desc()).limit(1).first()
             # On récupère la dernière collection en base, celle qui vient d'être créée.
+            collection = Collection.query.order_by(Collection.collection_id.desc()).limit(1).first()
 
+            # On associe l'utilisateur à la collection qu'il vient de créer avec la table AuthorshipCollection.
             authorship = AuthorshipCollection(
                 collection=collection,
                 user=current_user
             )
             db.session.add(authorship)
             db.session.commit()
-            # On associe l'utilisateur à la collection qu'il vient de créer avec la table AuthorshipCollection.
 
+            # On associe la collection à la catégorie choisie par l'utilisateur.ice.
             collection_has_categories = CollectionHasCategories(
                 collection=collection,
                 category=category
             )
             db.session.add(collection_has_categories)
             db.session.commit()
-            # On associe la collection à la catégorie choisie par l'utilisateur.ice.
 
+            # On itère sur les URL contenues dans imgs_url pour les stocker en base.
+            # Cela servira à les afficher lorsqu'il sera question de les annoter.
             for url in imgs_url:
                 Image.create(
                     image_url=url
