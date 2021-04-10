@@ -6,7 +6,7 @@
 
     <h1>{{titre}}</h1>
     {% if results %}
-        <p>{{results.total}} collections répondent à votre recherche.</p>
+        <p>Un total de {{results.total}} collections répondent à votre recherche.</p>
         <ul>
             {% for collection in results.items %}
                 <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a></li>
