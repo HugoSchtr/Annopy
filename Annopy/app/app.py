@@ -4,7 +4,6 @@ from flask_login import LoginManager
 import os
 from .constantes import CONFIG
 
-
 # On stocke le chemin vers le fichier courant dans chemin_actuel
 chemin_actuel = os.path.dirname(os.path.abspath(__file__))
 # On stocke le chemin du dossier des templates dans templates
@@ -32,7 +31,7 @@ app = Flask(
 from .routes import generic, collections, errors, api
 
 
-def config_app(config_name="test"):
+def config_app(config_name="dev"):
     """ Création de l'application
 
     :param config_name: nom de la configuration choisie pour lancer l'application

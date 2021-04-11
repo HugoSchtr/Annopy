@@ -13,14 +13,14 @@ if SECRET_KEY == "JE SUIS UN SECRET !":
 
 
 # On configure deux classes pour les deux configurations de l'application.
-class _TEST:
+class _DEV:
     # La class _TEST utilisera une database dédiée à la phase de développement
     SECRET_KEY = SECRET_KEY
     # On configure la base de données
     # sqlite:// indique le moteur utilisé, ici SQLite.
     # / indique qu'on utilise un chemin relatif pour trouver la database
-    # db_test.sqlite étant le fichier de la database
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///db_test.sqlite'
+    # db_dev.sqlite étant le fichier de la database
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///db_dev.sqlite'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -38,7 +38,6 @@ class _PRODUCTION:
 # On stocke les deux classes de configuration dans le dictionnaire CONFIG
 # On les réutilisera pour initialiser l'app dans app.py
 CONFIG = {
-    "test": _TEST,
+    "dev": _DEV,
     "production": _PRODUCTION
 }
-
