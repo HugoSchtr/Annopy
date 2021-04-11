@@ -48,6 +48,9 @@
             <a class="nav-link" href="{{url_for('sign_out')}}">Déconnexion - {{current_user.user_login}}</a>
         </li>
         {% endif %}
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('about')}}">À propos</a>
+        </li>
     </ul>
     <form class="form-inline" action="{{url_for('search')}}" method="GET">
         <input class="form-control" name="keyword" type="search" placeholder="Rechercher un projet"
