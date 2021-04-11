@@ -1,5 +1,6 @@
-from flask import jsonify
 from flask_login import login_required
+from flask import request
+from urllib.parse import urlencode
 
 from ..app import app
 from ..constantes import API_ROUTE
@@ -73,3 +74,65 @@ def api_image_data(image_id):
     except:
         # S'il y a une erreur, si l'image n'existe pas, on lance une erreur HTTP 404
         return json_404()
+
+
+@app.route(API_ROUTE+"/collections")
+def api_collections_browse():
+    """ Route permettant d'avoir le résultat d'une recherche dans les collections via l'API
+
+    :return: données au format JSON
+    """
+
+    # q est ici utilisé comme paramètre pour la recherche
+    keyword = request.args.get("q", None)
+    page = request.args.get("page", 1)
+
+    if isinstance(page, str) and page.isdigit():
+        page = int(page)
+    else:
+        page = 1
+
+    if keyword:
+        query = Collection.query.filter(
+            Collection.collection_name.like("%{}%".format(keyword))
+        )
+    else:
+        # S'il n'y a pas de mot-clé pour la recherche, on renvoie toutes les collections présentes en base
+        query = Collection.query
+
+    try:
+        resultats = query.paginate(page=page, per_page=5)
+    except Exception:
+        return json_404()
+
+    # On formate les données récupérées
+    dict_resultats = {
+        "links": {
+            "self": request.url
+        },
+        "data": [
+            collection.to_json_api()
+            for collection in resultats.items
+        ]
+    }
+
+    # On pagine la recherche
+    if resultats.has_next:
+        arguments = {
+            "page": resultats.next_num
+        }
+        if keyword:
+            arguments["q"] = keyword
+        dict_resultats["links"]["next"] = url_for("api_collections_browse", _external=True)+"?"+urlencode(arguments)
+
+    if resultats.has_prev:
+        arguments = {
+            "page": resultats.prev_num
+        }
+        if keyword:
+            arguments["q"] = keyword
+        dict_resultats["links"]["prev"] = url_for("api_collections_browse", _external=True)+"?"+urlencode(arguments)
+
+    # On convertit les données formatées en JSON
+    response = jsonify(dict_resultats)
+    return response
