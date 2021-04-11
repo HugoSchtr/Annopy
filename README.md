@@ -28,9 +28,13 @@ Le workflow de crowdsourcing a été conçue de la manière suivante :
 Les utilisateurs non connectées peuvent :
 
 * Naviguer à travers les collections déjà créées. 
+
 * Accéder à une collection et consulter ses metadonnées, ainsi que connaître le nombre d'images à annoter, sans pouvoir les consulter ni les annoter.
+
 * Faire une recherche dans les collections.
+
 * Accéder à la page de la communauté, montrant les membres de la plateforme. 
+
 * S'inscrire.
 
 ### Utilisateurs connectés
