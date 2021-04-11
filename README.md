@@ -58,6 +58,10 @@ Les utilisateurs connectés peuvent :
 
 Cette application a été développée avec Python3 et le framework d'application web Flask. Le design de l'application a été réalisé avec le framework [Bootstrap](https://getbootstrap.com/).
 
+# Structure de l'application
+
+Vous pouvez consulter l'arbre du dossier de l'application dans le [wiki](https://github.com/HugoSchtr/Annopy/wiki/Arbre-de-l'application).
+
 # Installation 
 
 ## Linux
