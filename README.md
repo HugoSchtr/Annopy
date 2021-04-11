@@ -8,10 +8,42 @@ Les annotations sont générées et gérées avec la librairie JavaScript [Annot
 
 Cette plateforme collaborative a été créée par [Hugo Scheithauer](https://github.com/HugoSchtr) dans le cadre du [Master 2 "Technologies appliquées à l'histoire"](http://www.chartes.psl.eu/fr/cursus/master-technologies-numeriques-appliquees-histoire) de l'Ecole nationale des chartes.
 
-# Fonctionnalités
+# Workflow du crowdsourcing 
 
 Le workflow de crowdsourcing a été conçue de la manière suivante :
 
 1. Un-e utilisateur-ice crée une collection, en indiquant le nom du projet, une courte description, une catégorie et en important des images depuis un serveur extérieur. L'utilisateur-ice peut choisir d'importer des images depuis deux sources différents : 
-  * Un manifest IIIF
-  * Un album Flickr
+
+    * Un manifest IIIF
+    * Un album Flickr
+
+2. Une fois la collection créée, les utilisateurs peuvent commencer à annoter la collection. 
+
+3. Il est possible de récupérer les données d'une image (metadonnées et annotations), ou d'une collection (metadonnées, images, annotations) à tout moment au format JSON via l'API. 
+
+# Fonctionnalités
+
+### Utilisateurs non connectés
+
+Les utilisateurs non connectées peuvent :
+
+* Naviguer à travers les collections déjà créées. 
+* Accéder à une collection et consulter ses metadonnées, ainsi que connaître le nombre d'images à annoter, sans pouvoir les consulter ni les annoter.
+* Faire une recherche dans les collections.
+* Accéder à la page de la communauté, montrant les membres de la plateforme. 
+* S'inscrire.
+
+### Utilisateurs connectés
+
+Les utilisateurs connectés peuvent :
+
+* Avoir accès aux fonctionnalités des utilisateurs non connectés.
+* Avoir accès à leur profil utilisateur
+    * Modifier leur compte utilisateur
+    * Modifier leur mot de passe
+* Créer une nouvelle collection pour commencer un projet de crowdsourcing. 
+* Créer une nouvelle catégorie si besoin. 
+* Annoter les images d'une collection. 
+* Modifier (nom, description) une collection.
+* Supprimer une collection. 
+* Récupérer via l'API les données d'une image d'une collection, ou d'une collection entière. 
