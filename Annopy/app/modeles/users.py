@@ -1,7 +1,8 @@
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from .. app import db, login, app
+from ..app import db, login
+
 
 # On crée la table User, une class qui hérite de la classe UserMixin et db.Model
 class User(UserMixin, db.Model):
@@ -172,7 +173,6 @@ class User(UserMixin, db.Model):
         else:
             errors.append("Votre mot de passe actuel est incorrect")
             return False, errors
-
 
     def get_id(self):
         """ Retourne l'id de l'objet actuellement utilisé
