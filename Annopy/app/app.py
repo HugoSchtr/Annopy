@@ -21,7 +21,7 @@ login = LoginManager()
 # On crée notre application
 app = Flask(
     # Nom de l'application
-    "Crow",
+    "Annopy",
     # Chemin du dossier templates
     template_folder=templates,
     # Chemin du dossier statics
