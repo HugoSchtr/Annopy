@@ -15,6 +15,7 @@ Dans l'ordre :
 /user_profile/password_update
 /sign_out
 /community
+/about
 """
 
 
@@ -211,3 +212,12 @@ def community():
     resultats = User.query.paginate(page=page, per_page=8)
 
     return render_template("pages/community.html", resultats=resultats)
+
+@app.route("/about")
+def about():
+    """ Route permettant d'afficher la section à propos de l'application
+
+    :return: about.html
+    :rtype: template
+    """
+    return render_template("pages/about.html")
