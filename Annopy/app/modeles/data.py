@@ -1,9 +1,8 @@
-from flask import url_for, jsonify
+from flask import url_for
 import datetime
 import json
 
-
-from .. app import db
+from ..app import db
 
 
 # Création de la table des collections
@@ -14,6 +13,7 @@ class Collection(db.Model):
     # Le nom d'une collection doit être unique.
     collection_name = db.Column(db.String(45), unique=True, nullable=False)
     collection_description = db.Column(db.Text, nullable=False)
+    collection_source = db.Column(db.Text, nullable=False)
     # jointure avec la table CollectionHasCategories, pour associer une collection à une catégorie.
     # Relation many to many
     has_categories = db.relationship('CollectionHasCategories', back_populates="collection")
@@ -27,7 +27,7 @@ class Collection(db.Model):
     has_images = db.relationship("CollectionHasImages", back_populates="collection", cascade="all, delete")
 
     @staticmethod
-    def create(collection_name, collection_description):
+    def create(collection_name, collection_description, collection_source):
         """ Crée une collection. Retourne un typle (booléen, nouvelle Collection ou liste).
         En cas d'erreur, renvoie False suivi de la liste des erreurs.
         En cas de succès, renvoie True suivi de la donnée enregistrée.
@@ -55,7 +55,8 @@ class Collection(db.Model):
             return False, errors
 
         # On vérifie que le nom de la collection n'est pas déjà pris.
-        collection_name_check = Collection.query.filter(Collection.collection_name.like("%"+collection_name+"%")).first()
+        collection_name_check = Collection.query.filter(
+            Collection.collection_name.like("%" + collection_name + "%")).first()
         if collection_name_check:
             errors.append("Une collection porte déjà ce nom : " + collection_name)
 
@@ -67,6 +68,7 @@ class Collection(db.Model):
         new_collection = Collection(
             collection_name=collection_name,
             collection_description=collection_description,
+            collection_source=collection_source
         )
 
         try:
@@ -158,7 +160,7 @@ class Category(db.Model):
             return False, errors
 
         # On vérifie que le nom de la catégorie n'est pas déjà pris.
-        category_check = Collection.query.filter(Collection.collection_name.like("%"+category_name+"%")).first()
+        category_check = Collection.query.filter(Collection.collection_name.like("%" + category_name + "%")).first()
         if category_check:
             errors.append("Une collection porte déjà ce nom : " + category_name)
 
@@ -284,11 +286,11 @@ class Image(db.Model):
                 "id": self.image_id,
                 "url": self.image_url,
                 "annotations":
-                [
-                    # on affiche chaque annotation associée à l'image concernée, grâce à la jointure
-                    annotation.to_json_api()
-                    for annotation in self.annotation
-                ]
+                    [
+                        # on affiche chaque annotation associée à l'image concernée, grâce à la jointure
+                        annotation.to_json_api()
+                        for annotation in self.annotation
+                    ]
             }
         }
 
