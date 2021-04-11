@@ -1,0 +1,32 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{%endblock%}
+{% block body %}
+
+
+<div class="jumbotron jumbotron-fluid text-center" style="padding-top: 10px">
+  <div class="container">
+    <h1 class="display-4">Crowdsourcing Digital Humanities projects</h1>
+    <p class="lead"></p>
+  </div>
+</div>
+
+{% if collections %}
+<p style="text-align: center; padding-top: 20px">Dernières collections créées :</p>
+<ul>
+{% for collection in collections %}
+    {% set categories = collection.has_categories %}
+    <li><b>{{collection.collection_name}}</b> </br> <u>Description</u> : {{collection.collection_description}} </br> <u>Catégorie</u> : {% for category in categories %}
+    {{category.category.name}}
+    {% endfor %}</li>
+    </br>
+{% endfor %}
+</ul>
+{% else %}
+<p style="text-align: center; padding-top: 20px">Il n'y a pas de projets en cours.</p>
+{% endif %}
+
+{% endblock %}
+
+

@@ -1,0 +1,159 @@
+{% extends "container.html" %}
+{% block afternav %}
+    {% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+        <div id="content" style="padding-top: 20px">
+            <!-- On uniformise l'affichage des images avec du style CSS -->
+          <img id="img_to_annotate" src="{{img.image_url}}" style="width: 45rem; height: auto">
+        </div>
+
+        <form method="post" role="form">
+        <button class="btn btn-primary" name="submit" id="submit">Envoyer les annotations au serveur</button>
+        </form>
+
+        <script>
+            // On lance le script JavaScript une fois que jQuery a détecté que le DOM est prêt à l'exécuter
+            $(document).ready(function(){
+
+                // On stocke dans une global variable la racine du script (racine application Flask)
+                // Cela n'est pas obligatoire avec la façon dont a été écrite la requête AJAX écrite plus bas
+                // On la garde pour des raisons de tests, au cas où, pour plus tard
+                $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+
+            // Ci-dessous, une fonction très pratique développée par John Resig, créateur de jQuery.
+            // La fonction permet de supprimer un index d'un array.
+            // Elle gère les problèmes d'index qui peuvent être générés
+            // Array Remove - By John Resig (MIT Licensed)
+            // https://johnresig.com/blog/javascript-array-remove/
+            Array.prototype.remove = function(from, to) {
+            var rest = this.slice((to || from) + 1 || this.length);
+            this.length = from < 0 ? this.length + from : from;
+            return this.push.apply(this, rest);
+            };
+
+            /* Pour gérer les annotations, voici le workflow qui a été choisi :
+
+            La page charge l'image choisie par l'utilisateur-ice,
+            'utilisateur-ice commence son travail d'annotation,
+            il/elle peut ajouter des annotations, modifier celles-ci, ou les supprimer.
+
+            Quand une nouvelle annotation est créée, elle est enregistrée dans la variable annotations (array).
+
+            Quand une annotation est modifiée, on récupère son index dans l'array annotations grâce à son ID,
+            on supprime l'index, et on ajoute la nouvelle annotation (qui est donc l'ancienne annotation,
+            mais modifiée.
+
+            Quand on supprime une annotation, on récupère son index dans l'array annotations grâce ) son ID,
+            et on supprime l'index.
+
+            Une fois le travail d'annotation terminé, l'utilisateur-ice clique sur un bouton dédié,
+            ce qui déclenche une requête AJAX qui envoie les données au serveur pour les enregistrer en database.
+
+            L'avantage de ce système est qu'une seule requête est faite au serveur, ce qui m'a permis de gérer
+            les difficultés rencontrées par la manipulation d'AJAX (redirections lorsque la requête est envoyée,
+            par exemple).
+
+            Le désavantage de ce système est qu'il est très facile de perdre tout son travail si le navigateur/machine
+            crash.
+            */
+            var annotations = [];
+
+            // https://recogito.github.io/annotorious/getting-started/
+            (function() {
+                var anno = Annotorious.init({
+                  // On initie Annotorious dans la variable anno
+                  // On indique l'ID HTML de l'image à annoter
+                  image: 'img_to_annotate'
+                });
+
+                // On gère les events avec .on('nomEvent')
+                // On commence avec l'event 'createAnnotation', qui permet de créer une annotation
+                // la fonction non-nommée prend en paramètre annotation, qui est l'annotation créée
+                anno.on('createAnnotation', function(annotation) {
+                  // On stocke annotation dans une variable pour la push dans l'array annotations
+                  var annotation_to_push = annotation;
+                  annotations.push(annotation_to_push);
+                  // console.log pour debug
+                  console.log(annotations);
+                  console.log('annotation créée');
+                });
+
+                // L'event 'updateAnnotation' permet de mettre à jour une annotation
+                anno.on('updateAnnotation', function(annotation) {
+                    var updated_annotation_json = annotation;
+                    // On récupère l'ID de l'annotation dans la variable id_updated_annotation
+                    var id_updated_annotation = updated_annotation_json['id'];
+                    // console.log pour debug
+                    console.log(id_updated_annotation);
+                    // Grâce à une boucle, on va chercher l'index (donc une annotation) qui a le même ID que la
+                    // "nouvelle" annotation (celle mise à jour)
+                    for (var i = 0; i < annotations.length; i++) {
+                        var obj = annotations[i];
+                        console.log(obj);
+                        for (var key in obj){
+                            var value = obj['id'];
+                            // Si l'ID de l'index est égal à l'ID de la nouvelle annotation
+                            // alors on remplace l'index par la nouvelle annotation
+                            if (value == id_updated_annotation){
+                                annotations[i] = updated_annotation_json;
+                            }
+                        }
+                    }
+                    // console.log pour debug
+                    console.log(annotations);
+                    console.log("Annotation " + id_updated_annotation + " mise à jour");
+                });
+
+                // L'event 'deleteAnnotation' permet de supprimer une annotation
+                anno.on('deleteAnnotation', function(annotation) {
+                    var deleted_annotation = annotation;
+                    // On cherche l'annotation à supprimer dans l'array annotations
+                    for (var i = 0; i < annotations.length; i++) {
+                        // Si l'index est identique à l'annotation à supprimer, alors on supprime l'index
+                        if (annotations[i] == deleted_annotation) {
+                            annotations.remove(i)
+                        }
+                    }
+                    // console.log pour debug
+                    console.log(annotations);
+                    console.log("Annotation supprimée");
+                });
+
+          })()
+
+        // Requête AJAX envoyant les données au server avec une requête HTTP POST.
+        // "AJAX is a technique for accessing web servers from a web page."
+        // (https://www.w3schools.com/js/js_ajax_intro.asp)
+        // La requête est envoyée lorsque l'utilisateur-ice clique sur le bouton possédant l'ID 'submit'
+        $('#submit').bind('click', function() {
+           $.ajax({
+                // On indique le type de requête HTTP, 'Post' ici
+                type: 'POST',
+                // Le type de data envoyée au serveur, JSON ici
+                contentType: 'application/json',
+                // Data envoyée au serveur
+                // On transforme l'array annotation grâce à la méthode JSON.stringify() qui convertit
+                // un objet JavaScript ou une valeur en une chaîne de caractères JSON.
+                data: JSON.stringify(annotations),
+                // dataType indique le type de data que la requête AJAX attend du serveur en retour.
+                // Ici, du JSON.
+                dataType: 'json',
+                // Une chaîne de caractères qui contient l'URL vers laquelle est envoyée la requête
+                url: '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}',
+               // fonctions JavaScript si la requête AJAX réussi ou échoue
+                success: function (success) {
+                    console.log(success);
+                    window.location = '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}';
+                },
+                error: function(error) {
+                console.log(error);
+            }
+            });
+        });
+        });
+
+        </script>
+
+</html>
+{% endblock %}

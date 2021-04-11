@@ -1,0 +1,11 @@
+{% extends "container.html" %}
+{% block afternav %}
+{% include "partials/recherche.html" %}
+{% endblock %}
+{% block body %}
+
+<br>
+<p>500 Internal Server Error</p>
+<a href="{{url_for('homepage')}}">Vous pouvez retourner vers la page d'accueil en cliquant ici.</a>
+
+{% endblock %}
