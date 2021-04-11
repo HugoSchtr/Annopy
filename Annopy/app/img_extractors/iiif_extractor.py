@@ -52,7 +52,6 @@ def iiif_query(manifest, from_f, to_f):
 
     return url_img_list
 
-
 # Test de la fonction
 # imgs = iiif_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", "1", 4)
 # print(imgs)
