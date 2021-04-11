@@ -49,7 +49,7 @@ Les utilisateurs connectés peuvent :
 
 * Créer une nouvelle collection pour commencer un projet de crowdsourcing. 
 * Créer une nouvelle catégorie si besoin. 
-* Annoter les images d'une collection. Attention, un-e utilisateur-ice ne peut annoter qu'une seule fois une image. Une fois les annotations envoyées, l'utilisateur-ice ne pourra plus avoir accès à l'image.
+* Annoter les images d'une collection. **Attention**, un-e utilisateur-ice ne peut annoter qu'une seule fois une image. Une fois les annotations envoyées, l'utilisateur-ice ne pourra plus avoir accès à l'image.
 * Modifier (nom, description) une collection.
 * Supprimer une collection. 
 * Récupérer via l'API les données d'une image d'une collection, ou d'une collection entière. 
