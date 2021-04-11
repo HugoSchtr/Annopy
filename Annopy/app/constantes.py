@@ -1,5 +1,4 @@
 from warnings import warn
-import os
 
 # On stocke la secret key
 # La secret key est utilisée pour les sessions cookies et d'autres aspects de sécurité
