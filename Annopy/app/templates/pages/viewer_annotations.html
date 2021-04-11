@@ -3,14 +3,25 @@
     {% include "partials/recherche.html" %}
 {% endblock %}
 {% block body %}
-        <div id="content" style="padding-top: 20px">
+
+<div class="container">
+    <div class="row text-center">
+        <div class="col-md-6" id="content" style="padding-top: 20px">
             <!-- On uniformise l'affichage des images avec du style CSS -->
-          <img id="img_to_annotate" src="{{img.image_url}}" style="width: 45rem; height: auto">
+          <img id="img_to_annotate" src="{{img.image_url}}" style="width: 38rem; height: auto">
         </div>
 
+        <div class="col-md-6" style="padding-top: 20px" >
+        <p>Pour annoter l'image, cliquez à l'endroit où vous souhaitez annoter, puis glisser votre souris jusqu'à former
+         l'annotation.</p>
+        <p>Une fois que votre travail d'annotation est terminé, vous pouvez sauvegarder votre travail
+        en cliquant sur le bouton ci-dessous.</p>
         <form method="post" role="form">
         <button class="btn btn-primary" name="submit" id="submit">Envoyer les annotations au serveur</button>
         </form>
+        </div>
+    </div>
+</div>
 
         <script>
             // On lance le script JavaScript une fois que jQuery a détecté que le DOM est prêt à l'exécuter

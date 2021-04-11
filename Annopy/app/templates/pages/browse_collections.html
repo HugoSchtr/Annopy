@@ -9,7 +9,8 @@
 <p>Il y a {{resultats.total}} collections actuellement.</p>
 <ul>
     {% for collection in resultats.items %}
-    <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a></li>
+    <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a>
+    </li>
     {% endfor %}
 </ul>
 <nav aria-label="research-pagination">

@@ -14,6 +14,8 @@
     {% endfor %}
     <dt>Description</dt>
     <dd>{{collection.collection_description}}</dd>
+    <dt>Source</dt>
+    <dd><a href="{{collection.collection_source}}">{{collection.collection_source}}</a></dd>
     <dt>Auteur</dt>
     {% for authorship in authorships %}
     <dd>{{authorship.user.user_login}}</dd>

@@ -1,41 +1,42 @@
 {% extends "container.html" %}
 {% block afternav %}
-    {% include "partials/recherche.html" %}
+{% include "partials/recherche.html" %}
 {%endblock%}
 {% block body %}
 
-    <h1>{{titre}}</h1>
-    {% if results %}
-        <p>Un total de {{results.total}} collections répondent à votre recherche.</p>
-        <ul>
-            {% for collection in results.items %}
-                <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a></li>
-            {% endfor %}
-        </ul>
-    <nav aria-label="research-pagination">
-      <ul class="pagination">
+<h1>{{titre}}</h1>
+{% if results %}
+<p>Un total de {{results.total}} collections répondent à votre recherche.</p>
+<ul>
+    {% for collection in results.items %}
+    <li><a href="{{url_for('collection', collection_id=collection.collection_id)}}">{{collection.collection_name}}</a>
+    </li>
+    {% endfor %}
+</ul>
+<nav aria-label="research-pagination">
+    <ul class="pagination">
         {%- for page in results.iter_pages() %}
-            {% if page %}
+        {% if page %}
 
-              {% if page != results.page %}
-                <li class="page-item">
-                    <a class="page-link" href="{{url_for('search', keyword=keyword, page=page)}}">{{page}}</a>
-                </li>
-              {% else %}
-                <li class="page-item active disabled">
-                  <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
-                </li>
-              {% endif %}
+        {% if page != results.page %}
+        <li class="page-item">
+            <a class="page-link" href="{{url_for('search', keyword=keyword, page=page)}}">{{page}}</a>
+        </li>
+        {% else %}
+        <li class="page-item active disabled">
+            <a class="page-link">{{page}} <span class="sr-only">(actuelle)</span></a>
+        </li>
+        {% endif %}
 
-            {% else %}
-                <li class="page-item disabled">
-                  <a class="page-link">...</a>
-                </li>
-            {% endif %}
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link">...</a>
+        </li>
+        {% endif %}
 
         {%- endfor %}
-      </ul>
-    </nav>
-    {% endif %}
+    </ul>
+</nav>
+{% endif %}
 
 {% endblock %}

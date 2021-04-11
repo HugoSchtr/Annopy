@@ -28,6 +28,11 @@
     <div>
         <button type="submit" class="btn btn-primary">Modifier la collection</button>
     </div>
+    <div>
+        <br>
+        <a href="{{url_for('collection', collection_id=collection.collection_id)}}">Pour retourner à la collection,
+        cliquez-ici</a>
+    </div>
 </form>
 
 {% endblock %}
