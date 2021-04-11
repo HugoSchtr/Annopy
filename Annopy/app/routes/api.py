@@ -1,5 +1,5 @@
 from flask_login import login_required
-from flask import request
+from flask import request, jsonify
 from urllib.parse import urlencode
 
 from ..app import app

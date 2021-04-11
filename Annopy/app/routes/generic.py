@@ -102,6 +102,7 @@ def sign_in():
 
     return render_template("pages/sign_in.html")
 
+
 # Nom de la fonction à renvoyer si l'utilisateur-ice a besoin de se log in
 login.login_view = 'sign_in'
 
@@ -212,6 +213,7 @@ def community():
     resultats = User.query.paginate(page=page, per_page=8)
 
     return render_template("pages/community.html", resultats=resultats)
+
 
 @app.route("/about")
 def about():

@@ -3,8 +3,8 @@ from flask_login import current_user, login_required
 
 from ..app import app
 from ..modeles.data import *
-from app.img_extractors.flickr_api_extractor import photoset_flickr_query
-from app.img_extractors.iiif_extractor import iiif_query
+from ..img_extractors.flickr_api_extractor import photoset_flickr_query
+from ..img_extractors.iiif_extractor import iiif_query
 
 """
 Routes gérant les collections dans l'app:
@@ -72,7 +72,7 @@ def create_collection_with_flickr():
 
         # Si tous les paramètres nécessaires à la fonction photoset_flickr_query sont présents,
         # on stocke la liste d'URL dans imgs_url
-        imgs_url = photoset_flickr_query(api_key, album_id, flickr_user_id)
+        url_query, imgs_url = photoset_flickr_query(api_key, album_id, flickr_user_id)
 
         # Il est possible qu'il y ait une erreur lors de la récupération des images
         # (API key erronée, user ID inexistant, etc.). Dans ce cas, on envoie un message d'erreur avec flash() et
@@ -101,7 +101,8 @@ def create_collection_with_flickr():
             # On lance la création de la nouvelle collection avec la méthode .create()
             status, data = Collection.create(
                 collection_name=request.form.get("collection_name", None),
-                collection_description=request.form.get("collection_description", None)
+                collection_description=request.form.get("collection_description", None),
+                collection_source=url_query
             )
 
             # On arrête le processus de création de collection si la méthode a retourné False.
@@ -219,7 +220,8 @@ def create_collection_with_iiif():
             # On lance la création de la nouvelle collection avec la méthode .create()
             status, data = Collection.create(
                 collection_name=request.form.get("collection_name", None),
-                collection_description=request.form.get("collection_description", None)
+                collection_description=request.form.get("collection_description", None),
+                collection_source=manifest_iiif
             )
 
             # On arrête le processus de création de collection si la méthode a retourné False.
@@ -521,6 +523,6 @@ def viewer(collection_id, image_id):
         # La mise en place d'un if côté JavaScript n'a pas fonctionné. Après recherche il est possible que cela
         # est causé par la nature asynchrone de la requête AJAX, que je ne sais pas comment gérer.
         flash("l'annotation a bien été enregistrée !", "success")
-        return redirect("/collection/" + str(collection_id)), json.dumps({'status':'OK', 'annotations':annotations})
+        return redirect("/collection/" + str(collection_id))
 
     return render_template("pages/viewer_annotations.html", img=img, collection_id=collection_id)

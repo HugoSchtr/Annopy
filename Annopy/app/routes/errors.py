@@ -1,7 +1,9 @@
 from flask import render_template
 from ..app import app
 
+
 # Routes pour gérer les erreurs HTTP
+
 
 @app.errorhandler(404)
 def not_found(error):
