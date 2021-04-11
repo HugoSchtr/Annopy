@@ -39,8 +39,10 @@ Les utilisateurs connectés peuvent :
 
 * Avoir accès aux fonctionnalités des utilisateurs non connectés.
 * Avoir accès à leur profil utilisateur
+
     * Modifier leur compte utilisateur
     * Modifier leur mot de passe
+
 * Créer une nouvelle collection pour commencer un projet de crowdsourcing. 
 * Créer une nouvelle catégorie si besoin. 
 * Annoter les images d'une collection. 
