@@ -1,0 +1,139 @@
+{
+  "type": "collection", 
+  "id": 7, 
+  "attributes": {
+    "name": "Nina Simone - Collection de demonstration", 
+    "Category": [
+      {
+        "category": {
+          "type": "category", 
+          "attributes": {
+            "category_name": "Musique"
+          }
+        }
+      }
+    ], 
+    "description": "Une collection comprenant une photographie de Nina Simone en train de chanter (photographie de David. D. Spitzed, 1977). "
+  }, 
+  "relationships": {
+    "editions": [
+      {
+        "author": {
+          "type": "people", 
+          "attributes": {
+            "user_id": 1, 
+            "login": "superadmin", 
+            "user_forename": "Hugo", 
+            "user_surname": "Sch"
+          }
+        }, 
+        "on": "Sun, 11 Apr 2021 16:15:17 GMT"
+      }
+    ]
+  }, 
+  "images": [
+    {
+      "image": {
+        "type": "image", 
+        "attributes": {
+          "id": 16, 
+          "url": "https://ids.si.edu/ids/iiif/NMAAHC-2012_164_125_001/full/full/0/default.jpg", 
+          "annotations": [
+            {
+              "type": "annotation", 
+              "attributes": {
+                "id": 6, 
+                "annotation_json": [
+                  {
+                    "type": "Annotation", 
+                    "body": [
+                      {
+                        "type": "TextualBody", 
+                        "value": "Nina Simone", 
+                        "purpose": "commenting"
+                      }
+                    ], 
+                    "target": {
+                      "source": "https://ids.si.edu/ids/iiif/NMAAHC-2012_164_125_001/full/full/0/default.jpg", 
+                      "selector": {
+                        "type": "FragmentSelector", 
+                        "conformsTo": "http://www.w3.org/TR/media-frags/", 
+                        "value": "xywh=pixel:263.2655334472656,459.997314453125,743.5176696777344,784.0206298828125"
+                      }
+                    }, 
+                    "@context": "http://www.w3.org/ns/anno.jsonld", 
+                    "id": "#bc6c4ae0-7cb0-47f8-b138-a34af9dfd368"
+                  }
+                ], 
+                "relationships": {
+                  "editions": [
+                    {
+                      "author": {
+                        "type": "people", 
+                        "attributes": {
+                          "user_id": 1, 
+                          "login": "superadmin", 
+                          "user_forename": "Hugo", 
+                          "user_surname": "Sch"
+                        }
+                      }, 
+                      "on": "Sun, 11 Apr 2021 16:15:58 GMT"
+                    }
+                  ]
+                }
+              }
+            }, 
+            {
+              "type": "annotation", 
+              "attributes": {
+                "id": 7, 
+                "annotation_json": [
+                  {
+                    "type": "Annotation", 
+                    "body": [
+                      {
+                        "type": "TextualBody", 
+                        "value": "microphone", 
+                        "purpose": "commenting"
+                      }
+                    ], 
+                    "target": {
+                      "source": "https://ids.si.edu/ids/iiif/NMAAHC-2012_164_125_001/full/full/0/default.jpg", 
+                      "selector": {
+                        "type": "FragmentSelector", 
+                        "conformsTo": "http://www.w3.org/TR/media-frags/", 
+                        "value": "xywh=pixel:850.5577392578125,1113.830078125,434.538330078125,773.8948974609375"
+                      }
+                    }, 
+                    "@context": "http://www.w3.org/ns/anno.jsonld", 
+                    "id": "#eed7ea20-4a9d-49f6-89ce-bf504ba6ffb5"
+                  }
+                ], 
+                "relationships": {
+                  "editions": [
+                    {
+                      "author": {
+                        "type": "people", 
+                        "attributes": {
+                          "user_id": 1, 
+                          "login": "superadmin", 
+                          "user_forename": "Hugo", 
+                          "user_surname": "Sch"
+                        }
+                      }, 
+                      "on": "Sun, 11 Apr 2021 16:15:58 GMT"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ], 
+  "links": {
+    "self": "http://127.0.0.1:5000/collection/7", 
+    "json": "http://127.0.0.1:5000/api/collection/7"
+  }
+}
