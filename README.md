@@ -57,6 +57,7 @@ Les utilisateurs connectés peuvent :
 * Modifier (nom, description) une collection.
 * Supprimer une collection. 
 * Récupérer via l'API les données d'une image d'une collection, ou d'une collection entière. 
+* Faire une recherche dans les collections avec l'API.
 
 # Démonstration
 
