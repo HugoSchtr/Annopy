@@ -2,7 +2,7 @@ import requests
 
 
 def iiif_query(manifest, from_f, to_f):
-    """ Récupère une liste d'URL d'image à partir d'un manifest IIIF.
+    """ Récupère une liste d'URL d'images à partir d'un manifest IIIF.
 
     :param manifest: URL du manifest IIIF duquel seront récupérées les URL de chaque image.
     :type manifest: str
@@ -26,7 +26,7 @@ def iiif_query(manifest, from_f, to_f):
     except ValueError:
         return False
 
-    # On stocke la requête HTTP dans une variable r.
+    # On stocke l'objet de la réponse HTTP dans r.
     r = requests.get(manifest)
 
     # Si le code HTTP de la requête est 200 (success), r est converti en objet JSON et stocké dans data.
@@ -38,20 +38,26 @@ def iiif_query(manifest, from_f, to_f):
             for page in item['canvases']:
                 for img_data in page["images"]:
                     img_url = img_data["resource"]["@id"]
+                    # Nous pourrions tester chaque URL pour savoir si le code de réponse HTTP est 200 avec :
+                    # request = requests.get(img_url)
+                    # Si le code HTTP est 200, alors on ajoute l'URL à url_list.
+                    # if request.status_code == 200:
+                        # url_img_list.append(img_url)
+                    # Cependant, obtenir le code de réponse HTTP pour chaque image d'un manifest volumineux
+                    # prend trop de temps.
+                    # On ajoute donc les liens sans vérifier leur validité.
                     url_img_list.append(img_url)
     else:
         return False
 
     # Afin d'améliorer l'expérience utilisateur-rice, on modifie la gestion des index de la liste.
     # Puis, on slice url_img_list selon le choix de l'utilisateur-rice.
-    if from_f == 1:
-        from_f = 0
-    if from_f > 1:
+    if from_f >= 1:
         from_f = from_f - 1
     url_img_list = url_img_list[from_f:to_f]
 
     return url_img_list
 
 # Test de la fonction
-# imgs = iiif_query("https://ids.si.edu/ids/manifest/NMAAHC-2012_164_125_001", "1", 4)
+# imgs = iiif_query("https://gallica.bnf.fr/iiif/ark:/12148/bpt6k9923506/manifest.json", 1, 4)
 # print(imgs)
