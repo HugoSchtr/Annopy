@@ -79,6 +79,7 @@ def api_image_data(image_id):
 
 
 @app.route(API_ROUTE+"/collections")
+@login_required
 def api_collections_browse():
     """ Route permettant d'avoir le résultat d'une recherche dans les collections via l'API
 
