@@ -14,21 +14,21 @@ class Collection(db.Model):
     collection_name = db.Column(db.String(45), unique=True, nullable=False)
     collection_description = db.Column(db.Text, nullable=False)
     collection_source = db.Column(db.Text, nullable=False)
-    # jointure avec la table CollectionHasCategories, pour associer une collection à une catégorie.
+    # Jointure avec la table CollectionHasCategories, pour associer une collection à une catégorie.
     # Relation many to many
     has_categories = db.relationship('CollectionHasCategories', back_populates="collection")
-    # jointure avec la table AuthorshipCollection, pour associer la création d'une collection à un utilisateur.
-    # relation many to many
-    # si la collection est supprimée, l'authorship est supprimé avec cascade="all, delete"
+    # Jointure avec la table AuthorshipCollection, pour associer la création d'une collection à un-e utilisateur-ice.
+    # Relation many to many
+    # Si la collection est supprimée, l'authorship est supprimé avec cascade="all, delete".
     collection_authorship = db.relationship("AuthorshipCollection", back_populates="collection", cascade="all, delete")
-    # jointure avec la table CollectionHasImages
-    # relation many to many
-    # si la collection est supprimée, suppression des images qui lui étaient associées.
+    # Jointure avec la table CollectionHasImages.
+    # Relation many to many
+    # Si la collection est supprimée, suppression des images qui lui étaient associées.
     has_images = db.relationship("CollectionHasImages", back_populates="collection", cascade="all, delete")
 
     @staticmethod
     def create(collection_name, collection_description, collection_source):
-        """ Crée une collection. Retourne un typle (booléen, nouvelle Collection ou liste).
+        """ Crée une collection. Retourne un tuple (booléen, nouvelle collection ou liste).
         En cas d'erreur, renvoie False suivi de la liste des erreurs.
         En cas de succès, renvoie True suivi de la donnée enregistrée.
 
@@ -36,11 +36,13 @@ class Collection(db.Model):
         :type collection_name: str
         :param collection_description: description de la collection
         :type collection_description: str
+        :param collection_source: URL indiquant la source des images de la collection (album flickr, manifest iiif)
+        :type collection_source: str
         :return: tuple (booléen, nouvelle Collection ou liste)
         :rtype: tuple
         """
 
-        # On crée la liste errors qui stockera les erreurs s'il y en a
+        # On crée la liste errors qui stockera les erreurs s'il y en a.
         errors = []
 
         # On vérifie qu'il y a un nom de collection et une description.
@@ -49,6 +51,7 @@ class Collection(db.Model):
             errors.append("Le nom de la collection est manquant.")
         if not collection_description:
             errors.append("La description de la collection est manquante.")
+        # On ne teste pas si collection_source est présent, le test est fait au niveau de la route.
 
         # Si la liste des erreurs n'est pas vide, renvoie False et la liste d'erreurs.
         if len(errors) > 0:
@@ -64,7 +67,7 @@ class Collection(db.Model):
         if len(errors) > 0:
             return False, errors
 
-        # On crée une nouvelle collection
+        # On crée une nouvelle collection.
         new_collection = Collection(
             collection_name=collection_name,
             collection_description=collection_description,
@@ -74,7 +77,7 @@ class Collection(db.Model):
         try:
             # On l'ajoute au transport vers la base de données.
             db.session.add(new_collection)
-            # On commit
+            # On commit.
             db.session.commit()
 
             # On renvoie la nouvelle collection
@@ -125,19 +128,19 @@ class Collection(db.Model):
         }
 
 
-# On crée la table des catégories
+# On crée la table des catégories.
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer(), primary_key=True)
-    # Le nom de chaque catégorie doit être unique
+    # Le nom de chaque catégorie doit être unique.
     name = db.Column(db.String(50), unique=True)
-    # jointure avec la table CollectionHasCategories. Associe une catégorie à une collection.
-    # relation many to many
+    # Jointure avec la table CollectionHasCategories. Associe une catégorie à une collection.
+    # Relation many to many
     has_collection = db.relationship("CollectionHasCategories", back_populates="category")
 
     @staticmethod
     def create(category_name):
-        """ Crée une catégorie. Retourne un typle (booléen, nouvelle Collection ou liste).
+        """ Crée une catégorie. Retourne un tuple (booléen, nouvelle catégorie ou liste).
         En cas d'erreur, renvoie False suivi de la liste des erreurs.
         En cas de succès, renvoie True suivi de la donnée enregistrée.
 
@@ -147,7 +150,7 @@ class Category(db.Model):
         :rtype: tuple
         """
 
-        # On crée la liste errors qui stockera les erreurs s'il y en a
+        # On crée la liste errors qui stockera les erreurs s'il y en a.
         errors = []
 
         # On vérifie qu'il y a un nom de catégorie.
@@ -168,7 +171,7 @@ class Category(db.Model):
         if len(errors) > 0:
             return False, errors
 
-        # On crée une nouvelle catégorie
+        # On crée une nouvelle catégorie.
         new_category = Category(
             name=category_name
         )
@@ -176,7 +179,7 @@ class Category(db.Model):
         try:
             # On l'ajoute au transport vers la base de données.
             db.session.add(new_category)
-            # On commit
+            # On commit.
             db.session.commit()
 
             # On renvoie la catégorie
@@ -199,17 +202,17 @@ class Category(db.Model):
         }
 
 
-# On crée la table d'association CollectionHasCategories pour les collections et les catégories
+# On crée la table d'association CollectionHasCategories pour les collections et les catégories.
 class CollectionHasCategories(db.Model):
     __tablename__ = "collection_categories"
     id = db.Column(db.Integer(), primary_key=True)
-    # Clé étrangère de la collection
+    # Clé étrangère de la collection.
     collection_id = db.Column(db.Integer(), db.ForeignKey('collection.collection_id'))
-    # Clé étrangère de la catégorie
+    # Clé étrangère de la catégorie.
     category_id = db.Column(db.Integer(), db.ForeignKey('categories.id'))
-    # Jointure avec la table Collection
+    # Jointure avec la table Collection.
     collection = db.relationship("Collection", back_populates="has_categories")
-    # Jointure avec la table Category
+    # Jointure avec la table Category.
     category = db.relationship("Category", back_populates="has_collection")
 
     def category_to_json(self):
@@ -224,32 +227,32 @@ class CollectionHasCategories(db.Model):
         }
 
 
-# On crée la table Image
+# On crée la table Image.
 class Image(db.Model):
     __tablename__ = "image"
     image_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
     image_url = db.Column(db.Text, nullable=False)
-    # Jointure avec la table CollectionHasImages
-    # relation many to many
+    # Jointure avec la table CollectionHasImages.
+    # Relation many to many
     has_collection = db.relationship("CollectionHasImages", back_populates="image")
-    # Jointure avec la table Annotation
-    # relation one to one
-    # Si l'image est supprimée, les annotations qui lui sont associées le seront également avec cascade="all, delete"
+    # Jointure avec la table Annotation.
+    # Relation one to one
+    # Si l'image est supprimée, les annotations qui lui sont associées le seront également avec cascade="all, delete".
     annotation = db.relationship("Annotation", back_populates="image", cascade="all, delete")
 
     @staticmethod
     def create(image_url):
-        """ Crée une image. Retourne un typle (booléen, nouvelle Image ou liste).
+        """ Crée une image. Retourne un tuple (booléen, nouvelle image ou liste).
         En cas d'erreur, renvoie False suivi de la liste des erreurs.
         En cas de succès, renvoie True suivi de la donnée enregistrée.
 
         :param image_url: URL de la nouvelle image
         :type image_url: str
-        :return: tuple (booléen, nouvelle Image ou liste)
+        :return: tuple (booléen, nouvelle image ou liste)
         :rtype: tuple
         """
 
-        # On crée la nouvelle image
+        # On crée la nouvelle image.
         new_image = Image(
             image_url=image_url
         )
@@ -257,9 +260,9 @@ class Image(db.Model):
         try:
             # On l'ajoute au transport vers la base de données.
             db.session.add(new_image)
-            # On commit
+            # On commit.
             db.session.commit()
-            # On renvoie la nouvele image
+            # On renvoie la nouvele image.
             return True, new_image
 
         except Exception as erreur:
@@ -295,7 +298,7 @@ class Image(db.Model):
         }
 
 
-# On crée la table Annotation
+# On crée la table Annotation.
 class Annotation(db.Model):
     __tablename__ = "annotation"
     annotation_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -303,10 +306,10 @@ class Annotation(db.Model):
     # en tant que chaîne de caractères formatées à l'insertion.
     # Voir https://recogito.github.io/annotorious/getting-started/web-annotation/
     annotation_json = db.Column(db.Text, nullable=False)
-    # Clé étrangère de l'image à laquelle est associée l'annotation
+    # Clé étrangère de l'image à laquelle est associée l'annotation.
     annotation_image_id = db.Column(db.Integer, db.ForeignKey("image.image_id"))
-    # Jointure avec la table Image
-    # relation one to one
+    # Jointure avec la table Image.
+    # Relation one to one
     image = db.relationship("Image", back_populates="annotation")
     # Jointure avec la table AuthorshipAnnotation.
     # Relation many to many
@@ -340,17 +343,17 @@ class Annotation(db.Model):
         }
 
 
-# On crée la table d'association AuthorshipCollection pour les collections et les users
+# On crée la table d'association AuthorshipCollection pour les collections et les users.
 class AuthorshipCollection(db.Model):
     authorship_collection_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
     # Clé étrangère de la collection
     authorship_collection_collection_id = db.Column(db.Integer, db.ForeignKey('collection.collection_id'))
-    # Clé étrangère du user
+    # Clé étrangère du user.
     authorship_collection_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     authorship_collection_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # Jointure avec la table User
+    # Jointure avec la table User.
     user = db.relationship("User", back_populates="authorship_collection")
-    # Jointure avec la table Collection
+    # Jointure avec la table Collection.
     collection = db.relationship("Collection", back_populates="collection_authorship")
 
     def author_to_json(self):
@@ -366,17 +369,17 @@ class AuthorshipCollection(db.Model):
         }
 
 
-# On crée la table d'association AuthorshipAnnotation pour les annotations et les users
+# On crée la table d'association AuthorshipAnnotation pour les annotations et les users.
 class AuthorshipAnnotation(db.Model):
     authorship_annotation_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
-    # Clé étrangère du user
+    # Clé étrangère du user.
     authorship_annotation_user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    # Clé étrangère de l'annotation
+    # Clé étrangère de l'annotation.
     authorship_annotation_annotation_id = db.Column(db.Integer, db.ForeignKey('annotation.annotation_id'))
     authorship_annotation_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    # Jointure avec la table User
+    # Jointure avec la table User.
     user = db.relationship("User", back_populates="authorship_annotation")
-    # Jointure avec la table Annotation
+    # Jointure avec la table Annotation.
     annotation = db.relationship("Annotation", back_populates="annotation_authorship", cascade="all, delete")
 
     def author_anno_to_json(self):
@@ -392,16 +395,16 @@ class AuthorshipAnnotation(db.Model):
         }
 
 
-# On crée la table d'association CollectionHasImages pour les collections et les images
+# On crée la table d'association CollectionHasImages pour les collections et les images.
 class CollectionHasImages(db.Model):
     collection_has_images_id = db.Column(db.Integer, nullable=True, autoincrement=True, primary_key=True)
-    # Clé étrangère de la collection
+    # Clé étrangère de la collection.
     collection_has_images_collection_id = db.Column(db.Integer, db.ForeignKey('collection.collection_id'))
-    # Clé étrangère de l'image
+    # Clé étrangère de l'image.
     collection_has_images_image_id = db.Column(db.Integer, db.ForeignKey('image.image_id'))
-    # Jointure avec la table Collection
+    # Jointure avec la table Collection.
     collection = db.relationship("Collection", back_populates="has_images")
-    # Jointure avec la table Image
+    # Jointure avec la table Image.
     image = db.relationship("Image", back_populates="has_collection", cascade="all, delete")
 
     def image_to_json(self):

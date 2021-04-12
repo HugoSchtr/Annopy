@@ -152,14 +152,18 @@
                 dataType: 'json',
                 // Une chaîne de caractères qui contient l'URL vers laquelle est envoyée la requête
                 url: '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}',
-               // fonctions JavaScript si la requête AJAX réussi ou échoue
+               /* fonctions JavaScript si la requête AJAX réussi ou échoue.
+               Dans le cadre de cette application, le serveur ne donne ici pas de réponse pour tester
+               si la requête a échoué ou non.
+               C'est pour cela que les lignes suivantes sont en commentaires :
                 success: function (success) {
                     console.log(success);
                     window.location = '{{url_for("viewer", collection_id=collection_id, image_id=img.image_id)}}';
                 },
                 error: function(error) {
                 console.log(error);
-            }
+            } */
+
             });
         });
         });

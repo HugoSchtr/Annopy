@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ..app import db, login
 
 
-# On crée la table User, une class qui hérite de la classe UserMixin et db.Model
+# On crée la table User, une class qui hérite des classes UserMixin et db.Model.
 class User(UserMixin, db.Model):
     __tablename__ = "user"
     user_id = db.Column(db.Integer, unique=True, nullable=False, primary_key=True, autoincrement=True)
@@ -13,16 +13,16 @@ class User(UserMixin, db.Model):
     user_login = db.Column(db.String(45), nullable=False, unique=True)
     user_email = db.Column(db.String(100), nullable=False)
     user_password = db.Column(db.Text, nullable=False)
-    # Jointure avec la table AuthorshipCollection
-    # relation many to many
+    # Jointure avec la table AuthorshipCollection.
+    # Relation many to many
     authorship_collection = db.relationship("AuthorshipCollection", back_populates="user")
-    # Jointure avec la table AuthorshipAnnotation
-    # relation many to many
+    # Jointure avec la table AuthorshipAnnotation.
+    # Relation many to many
     authorship_annotation = db.relationship("AuthorshipAnnotation", back_populates="user")
 
     @staticmethod
     def identification(login, password):
-        """ Identifie un utilisateur. Si cela fonctionne, renvoie les données de l'utilisateur-ice.
+        """ Identifie un-e utilisateur-ice. Si cela fonctionne, renvoie les données de l'utilisateur-ice.
 
         :param login: Login de l'utilisateur-ice
         :type login: str
@@ -32,14 +32,14 @@ class User(UserMixin, db.Model):
         :rtype: User or None
         """
 
-        # On fait une query dont le résultat est stocké dans la variable user.
-        # On cherche l'User qui a le même login que celui fourni par l'utilisateur-ice.
+        # On fait une query à la table User, on stocke l'objet récupéré dans la variable user.
+        # On cherche l'user qui a le même login que celui fourni par l'utilisateur-ice.
         user = User.query.filter(User.user_login == login).first()
 
         # Si la query a renvoyé un objet, on réalise l'identification.
         if user:
-            # On vérifie que le mot de passe est le bon en comparant le password donné par l'utilisateur-ice et le hash
-            # Pour retourner l'user, il faut que le login soit True, et que check_password_hash ait renvoyé True
+            # On vérifie que le mot de passe est le bon en comparant le password donné par l'utilisateur-ice et le hash.
+            # Pour retourner l'user, il faut que le login soit True, et que check_password_hash ait renvoyé True.
             if login and check_password_hash(user.user_password, password):
                 return user
         return None
@@ -64,7 +64,7 @@ class User(UserMixin, db.Model):
         :rtype: tuple
         """
 
-        # On crée la liste errors qui stockera les erreurs s'il y en a
+        # On crée la liste errors qui stockera les erreurs s'il y en a.
         errors = []
         # On vérifie qu'il y a un nom, prénom, login, email et password.
         # Le cas contraire, on met à jour la liste des erreurs.
@@ -79,13 +79,13 @@ class User(UserMixin, db.Model):
         if not user_password or len(user_password) < 6:
             errors.append("le mot de passe fourni est vide ou fait moins de 6 caractères")
 
-        # On vérifie que l'email et le login renseigné n'existent pas déjà dans la base de données
-        # On fait une query avec un filtre
-        # On cherche à récupérer un user qui a le même email ou le même login que ceux renseignés pour vérifier
+        # On vérifie que l'email et le login renseigné n'existent pas déjà dans la base de données.
+        # On fait une query avec un filtre.
+        # On cherche à récupérer un user qui a le même email ou le même login que ceux renseignés pour vérifier.
         uniques = User.query.filter(
             db.or_(User.user_email == user_email, User.user_login == user_login)
         ).count()
-        # Si la variable uniques contient plus de 0 objets, alors l'user s'est déjà inscrit avec ces identifiants
+        # Si la variable uniques contient plus de 0 objets, alors les identifiants existent déjà en base.
         if uniques > 0:
             errors.append("l'email ou le login sont déjà inscrits dans notre base de données")
 
@@ -93,7 +93,7 @@ class User(UserMixin, db.Model):
         if len(errors) > 0:
             return False, errors
 
-        # On crée un-e utilisateur-rice
+        # On crée un-e utilisateur-rice.
         new_user = User(
             user_forename=user_forename,
             user_surname=user_surname,
@@ -103,12 +103,12 @@ class User(UserMixin, db.Model):
         )
 
         try:
-            # On l'ajoute au transport vers la base de données
+            # On l'ajoute au transport vers la base de données.
             db.session.add(new_user)
-            # On commit
+            # On commit.
             db.session.commit()
 
-            # On renvoie utilisateur-rice
+            # On renvoie utilisateur-rice.
             return True, new_user
         except Exception as erreur:
             return False, [str(erreur)]
@@ -129,12 +129,12 @@ class User(UserMixin, db.Model):
         :rtype: tuple
         """
 
-        # On récupère dans la variable user l'utilisateur-rice qui souhaite changer son password
+        # On récupère dans la variable user l'utilisateur-rice qui souhaite changer son password.
         user = User.query.filter(User.user_login == login).first()
 
-        # On crée la liste errors qui stockera les erreurs s'il y en a
+        # On crée la liste errors qui stockera les erreurs s'il y en a.
         errors = []
-        # On vérifie qu'il y a le password actuel, le nouveau password, et la confirmation du nouveau password
+        # On vérifie qu'il y a le password actuel, le nouveau password, et la confirmation du nouveau password.
         # Le cas contraire, on met à jour la liste des erreurs.
         if not password:
             errors.append("mot de passe actuel manquant")
@@ -147,9 +147,9 @@ class User(UserMixin, db.Model):
         if len(errors) > 0:
             return False, errors
 
-        # On vérifie que l'utilisateur-rice a utilisé son bon password
+        # On vérifie que l'utilisateur-rice a utilisé son bon password.
         if check_password_hash(user.user_password, password):
-            # On vérifie que le nouveau password correspond à la confirmation du nouveau password
+            # On vérifie que le nouveau password correspond à la confirmation du nouveau password.
             if new_password_1 == new_password_2:
                 # Si c'est le cas, on hash le nouveau password
                 user.user_password = generate_password_hash(new_password_2)
@@ -159,17 +159,17 @@ class User(UserMixin, db.Model):
                 return False, errors
 
             try:
-                # On ajoute l'updated user au transport vers la base de données
+                # On ajoute l'updated user au transport vers la base de données.
                 db.session.add(user)
-                # On commit
+                # On commit.
                 db.session.commit()
 
-                # On renvoie l'updated user
+                # On renvoie l'updated user.
                 return True, user
 
             except Exception as erreur:
                 return False, [str(erreur)]
-        # Si l'utilisateur-rice n'a pas donné son mot de passe actuel, on envoie l'erreur
+        # Si l'utilisateur-rice n'a pas donné son mot de passe actuel, on envoie l'erreur.
         else:
             errors.append("Votre mot de passe actuel est incorrect")
             return False, errors

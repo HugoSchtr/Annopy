@@ -10,6 +10,7 @@ from ..modeles.data import *
 Routes pour l'API, dans l'ordre:
 /api/collection/<int:collection_id>
 /api/image/<int:image_id>
+/api/collections
 """
 
 
@@ -18,6 +19,7 @@ def json_404():
 
     :return: HTTP response
     """
+
     response = jsonify({"erreur": "Unable to perform the query"})
     response.status_code = 404
     return response
@@ -40,13 +42,13 @@ def api_collection_data(collection_id):
 
     try:
         # On fait une query à la base de données pour récupérer une collection selon son ID.
-        # L'objet récupéré est stocké dans la variable query
+        # L'objet récupéré est stocké dans la variable query.
         query = Collection.query.get(collection_id)
-        # On exécute la fonction to_json_api() définie dans data.py pour la class Collection à query
-        # On convertit la réponse de la fonction au format JSON avec la fonction jsonify()
+        # On exécute la fonction to_json_api() définie dans data.py pour la class Collection à query.
+        # On convertit la réponse de la fonction au format JSON avec la fonction jsonify().
         return jsonify((query.to_json_api()))
     except:
-        # S'il y a une erreur, si la collection n'existe pas, on lance une erreur HTTP 404
+        # S'il y a une erreur, si la collection n'existe pas, on lance une erreur HTTP 404.
         return json_404()
 
 
@@ -66,13 +68,13 @@ def api_image_data(image_id):
 
     try:
         # On fait une query à la base de données pour récupérer une image selon son ID.
-        # L'objet récupéré est stocké dans la variable query
+        # L'objet récupéré est stocké dans la variable query.
         query = Image.query.get(image_id)
-        # On exécute la fonction to_json_api() définie dans data.py pour la class Image à query
-        # On convertit la réponse de la fonction au format JSON avec la fonction jsonify()
+        # On exécute la fonction to_json_api() définie dans data.py pour la class Image à query.
+        # On convertit la réponse de la fonction au format JSON avec la fonction jsonify().
         return jsonify((query.to_json_api()))
     except:
-        # S'il y a une erreur, si l'image n'existe pas, on lance une erreur HTTP 404
+        # S'il y a une erreur, si l'image n'existe pas, on lance une erreur HTTP 404.
         return json_404()
 
 
@@ -83,7 +85,7 @@ def api_collections_browse():
     :return: données au format JSON
     """
 
-    # q est ici utilisé comme paramètre pour la recherche
+    # q est ici utilisé comme paramètre pour la recherche.
     keyword = request.args.get("q", None)
     page = request.args.get("page", 1)
 
@@ -97,7 +99,7 @@ def api_collections_browse():
             Collection.collection_name.like("%{}%".format(keyword))
         )
     else:
-        # S'il n'y a pas de mot-clé pour la recherche, on renvoie toutes les collections présentes en base
+        # S'il n'y a pas de mot-clé pour la recherche, on renvoie toutes les collections présentes en base.
         query = Collection.query
 
     try:
@@ -105,7 +107,7 @@ def api_collections_browse():
     except Exception:
         return json_404()
 
-    # On formate les données récupérées
+    # On formate les données récupérées.
     dict_resultats = {
         "links": {
             "self": request.url
@@ -116,7 +118,7 @@ def api_collections_browse():
         ]
     }
 
-    # On pagine la recherche
+    # On pagine la recherche.
     if resultats.has_next:
         arguments = {
             "page": resultats.next_num
@@ -133,6 +135,6 @@ def api_collections_browse():
             arguments["q"] = keyword
         dict_resultats["links"]["prev"] = url_for("api_collections_browse", _external=True)+"?"+urlencode(arguments)
 
-    # On convertit les données formatées en JSON
+    # On convertit les données formatées en JSON.
     response = jsonify(dict_resultats)
     return response

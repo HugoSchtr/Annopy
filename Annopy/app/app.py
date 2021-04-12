@@ -4,42 +4,42 @@ from flask_login import LoginManager
 import os
 from .constantes import CONFIG
 
-# On stocke le chemin vers le fichier courant dans chemin_actuel
+# On stocke le chemin vers le fichier courant dans chemin_actuel.
 chemin_actuel = os.path.dirname(os.path.abspath(__file__))
-# On stocke le chemin du dossier des templates dans templates
+# On stocke le chemin du dossier des templates dans templates.
 templates = os.path.join(chemin_actuel, "templates")
-# On stocke le chemin du dossier des statics dans statics
+# On stocke le chemin du dossier des statics dans statics.
 statics = os.path.join(chemin_actuel, "static")
 
-# On initie l'objet SQLAlchemy en le stockant dans la variable db
+# On initie l'objet SQLAlchemy en le stockant dans la variable db.
 db = SQLAlchemy()
 
-# On met en place la gestion d'utilisateur-rice-s
+# On met en place la gestion d'utilisateur-rice-s.
 login = LoginManager()
 
-# On crée notre application
+# On crée notre application.
 app = Flask(
-    # Nom de l'application
+    # Nom de l'application.
     "Annopy",
-    # Chemin du dossier templates
+    # Chemin du dossier templates.
     template_folder=templates,
-    # Chemin du dossier statics
+    # Chemin du dossier statics.
     static_folder=statics
 )
 
-# On importe les routes
+# On importe les routes.
 from .routes import generic, collections, errors, api
 
 
 def config_app(config_name="dev"):
-    """ Création de l'application
+    """ Création de l'application.
 
     :param config_name: nom de la configuration choisie pour lancer l'application
     :type config_name: str
     :return: app
     """
 
-    # On initie la configuration de l'application
+    # On initie la configuration de l'application.
     # Les configurations sont deux classes, comprises dans le dictionnaire CONFIG, dans constantes.py
     app.config.from_object(CONFIG[config_name])
 
