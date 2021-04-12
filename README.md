@@ -53,7 +53,7 @@ Les utilisateurs connectés peuvent :
    * Avec l'API de Flickr. Dans ce cas, une Flickr API key, ainsi que l'ID de l'album Flickr duquel on veut récupérer les images, ainsi que l'ID de l'utilisateur-ice qui a créé l'album sont nécessaires
 
 * Créer une nouvelle catégorie si besoin. 
-* Annoter les images d'une collection. **Attention**, un-e utilisateur-ice ne peut annoter qu'une seule fois une image. Une fois les annotations envoyées, l'utilisateur-ice ne pourra plus avoir accès à l'image.
+* Annoter les images d'une collection. **Attention**, un-e utilisateur-ice ne peut annoter qu'une seule fois une image. Une fois les annotations envoyées, l'utilisateur-ice ne pourra plus avoir accès à l'image. Voir dans le [wiki](https://github.com/HugoSchtr/Annopy/wiki/Exemple-d'annotation-dans-l'application) un exemple d'annotation dans le viewer de l'application.
 * Modifier (nom, description) une collection.
 * Supprimer une collection. 
 * Récupérer via l'API les données d'une image d'une collection, ou d'une collection entière. 
