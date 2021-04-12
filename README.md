@@ -73,7 +73,7 @@ Vous pouvez consulter l'arbre du dossier de l'application dans le [wiki](https:/
 
 # Installation 
 
-## Linux
+## Linux (Ubuntu/Debian)
 
 * Cloner ce repository git en local : ```git clone https://github.com/HugoSchtr/Annopy```
 
