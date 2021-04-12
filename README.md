@@ -54,6 +54,10 @@ Les utilisateurs connectés peuvent :
 * Supprimer une collection. 
 * Récupérer via l'API les données d'une image d'une collection, ou d'une collection entière. 
 
+# Démonstration
+
+Des collections de démonstration ont été créées pour montrer ce qu'il est possible de faire avec l'application. Vous pouvez annoter les images de ces collections en créant un compte utilisateur, ou créer votre propre collection.
+
 # Spécificités techniques
 
 Cette application a été développée avec Python3 et le framework d'application web Flask. Le design de l'application a été réalisé avec le framework [Bootstrap](https://getbootstrap.com/).
