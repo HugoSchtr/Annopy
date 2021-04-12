@@ -19,7 +19,7 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
     imgs = []
 
     # On crée une variable qui va stocker la requête faite à l'API REST Flickr, plusieurs paramètres sont nécessaires.
-    # La method flickr.photosets.getPhotos permet de récupérer une liste de photos dans un album.
+    # La méthode flickr.photosets.getPhotos permet de récupérer une liste de photos dans un album et leurs métadonnées.
     # api_key correspond à l'API key de l'utilisateur-rice.
     # photoset_id correspond à l'ID de l'album duquel on veut récupérer les images.
     # user_id correspond à l'ID utilisateur à qui appartient l'album duquel on veut récupérer les images.
@@ -29,7 +29,7 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
         api_key, photoset_id, user_id
     )
 
-    # On stocke la requête HTTP dans une variable r.
+    # On stocke l'objet de la réponse HTTP dans r.
     r = requests.get(url_query)
 
     # Si le code HTTP de la requête est 200 (success), r est converti en objet JSON et stocké dans data.
@@ -49,7 +49,7 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
         return False
 
     # L'objet JSON récupéré depuis l'API Flickr renvoie une liste inversée des images d'une collection.
-    # Pour obtenir l'ordre original, visible sur un navigateur, on inverse la liste imgs.
+    # Pour obtenir l'ordre original des images dans la liste, visible sur un navigateur, on inverse la liste imgs.
     imgs = imgs[::-1]
 
     # On crée une liste vide url_list qui va stocker les URL de chaque image de l'album.
@@ -60,13 +60,20 @@ def photoset_flickr_query(api_key, photoset_id, user_id):
     # Index 0 = ID de l'image
     # Index 1 = secret
     # Index 2 = server
-    # le paramètre b permet de récupérer l'image dans un format large (1024 px maximum pour un côté)
-    # Chaque URL est stockée dans url_list.
+    # le paramètre b dans l'URL créée permet de récupérer l'image dans un format large (1024 px maximum pour un côté).
+    # Chaque URL est stockée dans la liste url_list.
     for idx in imgs:
         id = idx[0]
         secret = idx[1]
         server = idx[2]
-        url_list.append("https://live.staticflickr.com/{0}/{1}_{2}_{3}.jpg".format(server, id, secret, "b"))
+        # On construit l'URL
+        query = "https://live.staticflickr.com/{0}/{1}_{2}_{3}.jpg".format(server, id, secret, "b")
+        # On teste chaque URL pour savoir si le code de réponse HTTP est 200.
+        # On s'assure ainsi que chaque URL, au moment de sa récupération, est valide.
+        request = requests.get(query)
+        # Si le code HTTP est 200, alors on ajoute l'URL à url_list.
+        if request.status_code == 200:
+            url_list.append(query)
 
     return url_query, url_list
 
